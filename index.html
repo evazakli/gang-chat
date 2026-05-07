@@ -8,30 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ========== KENDİ BİLGİLERİNİ BURAYA YAZMA, AŞAĞIDA JS BÖLÜMÜNDE DEĞİŞTİR ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #09090b; 
-      --surface:   rgba(24, 24, 27, 0.7); 
-      --surface-solid: #18181b;
-      --surface2:  #27272a; 
-      --border:    #3f3f46; 
-      --accent:    #6366f1; 
-      --accent-hover:#4f46e5;
-      --accent2:   #a855f7; 
-      --text:      #f4f4f5; 
-      --text-dim:  #a1a1aa; 
-      --radius:    16px;
-      --font-brand:'Syne', sans-serif;
-      --font-main: 'Inter', sans-serif;
-      --font-mono: 'DM Mono', monospace;
+      --bg: #09090b; --surface: rgba(24, 24, 27, 0.7); --surface-solid: #18181b;
+      --surface2: #27272a; --border: #3f3f46; --accent: #6366f1; --accent-hover:#4f46e5;
+      --accent2: #a855f7; --text: #f4f4f5; --text-dim: #a1a1aa; --radius: 16px;
+      --font-brand:'Syne', sans-serif; --font-main: 'Inter', sans-serif; --font-mono: 'DM Mono', monospace;
     }
 
-    html, body {
-      height: 100%; background: var(--bg); color: var(--text);
-      font-family: var(--font-main); overflow: hidden; -webkit-font-smoothing: antialiased;
-    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-main); overflow: hidden; -webkit-font-smoothing: antialiased; }
 
     /* ===== ÖZEL LOGO AYARLARI ===== */
     .logo-img-big { width: 120px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.4)); margin-bottom: -10px; }
@@ -39,60 +25,27 @@
     .logo-img-sm { width: 32px; height: 32px; object-fit: contain; }
 
     /* ===== YÜKLEME EKRANI ===== */
-    #loading-screen {
-      position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 20px; z-index: 9999; transition: opacity .5s ease;
-    }
-    #loading-screen .logo-big {
-      font-family: var(--font-brand); font-size: 2.5rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; text-align: center; padding: 0 20px;
-    }
-    .spinner {
-      width: 40px; height: 40px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
-    }
+    #loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; z-index: 9999; transition: opacity .5s ease; }
+    #loading-screen .logo-big { font-family: var(--font-brand); font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; text-align: center; padding: 0 20px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ===== GİRİŞ EKRANI ===== */
-    #login-screen {
-      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%), var(--bg); z-index: 100; padding: 24px;
-    }
-    .login-card {
-      width: 100%; max-width: 400px; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 24px; padding: 48px 32px;
-      display: flex; flex-direction: column; gap: 24px; box-shadow: 0 32px 64px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
+    #login-screen { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%), var(--bg); z-index: 100; padding: 24px; }
+    .login-card { width: 100%; max-width: 400px; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 24px; padding: 48px 32px; display: flex; flex-direction: column; gap: 24px; box-shadow: 0 32px 64px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,0.05); }
     .login-header { text-align: center; display: flex; flex-direction: column; align-items: center; }
-    .login-header .logo {
-      font-family: var(--font-brand); font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;
-    }
+    .login-header .logo { font-family: var(--font-brand); font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
     .login-header p { color: var(--text-dim); font-size: 0.95rem; margin-top: 8px; }
     .input-group { display: flex; flex-direction: column; gap: 10px; }
     .input-group label { font-size: .85rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-    .input-group input {
-      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text);
-      font-family: var(--font-mono); font-size: 1.05rem; padding: 16px; outline: none; transition: all .2s ease;
-    }
+    .input-group input { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-mono); font-size: 1.05rem; padding: 16px; outline: none; transition: all .2s ease; }
     .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: var(--radius); font-family: var(--font-main);
-      font-size: 1.05rem; font-weight: 600; padding: 16px; cursor: pointer; transition: all .2s ease; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); margin-top: 8px;
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: var(--radius); font-family: var(--font-main); font-size: 1.05rem; font-weight: 600; padding: 16px; cursor: pointer; transition: all .2s ease; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); margin-top: 8px; }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4); }
-    .btn-primary:active { transform: translateY(0); }
-    .login-error { color: #ef4444; font-size: .85rem; text-align: center; min-height: 20px; font-weight: 500; }
 
     /* ===== ANA EKRAN ===== */
     #app { display: none; flex-direction: column; height: 100dvh; overflow: hidden; background: radial-gradient(circle at top center, rgba(99, 102, 241, 0.05), transparent 50%), var(--bg); }
-
-    /* HEADER */
-    .app-header {
-      display: flex; align-items: center; justify-content: space-between; padding: 16px 24px;
-      background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; gap: 12px; z-index: 10;
-    }
+    .app-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; gap: 12px; z-index: 10; }
     .app-header .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-brand); font-size: clamp(1rem, 4vw, 1.4rem); font-weight: 800; letter-spacing: -0.5px; }
     .app-header .logo span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .header-right { display: flex; align-items: center; gap: 12px; }
@@ -104,203 +57,190 @@
 
     /* SEKMELER */
     .tabs { display: flex; background: var(--surface-solid); border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 12px; }
-    .tab-btn {
-      flex: 1; padding: 14px 8px; background: transparent; border: none; color: var(--text-dim); font-family: var(--font-main); font-size: 0.9rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 6px; position: relative;
-    }
+    .tab-btn { flex: 1; padding: 14px 8px; background: transparent; border: none; color: var(--text-dim); font-family: var(--font-main); font-size: 0.9rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 6px; position: relative; }
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-    .tab-btn .tab-icon { font-size: 1.1rem; }
-
-    /* İÇERİK ALANLARI */
     .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; }
     .tab-content.active { display: flex; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* MESAJ LISTESI ORTAK */
+    /* MESAJLAR VE ALINTI YAPISI */
     .messages-list, .posts-list, .users-list { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
     .messages-list::-webkit-scrollbar, .posts-list::-webkit-scrollbar, .users-list::-webkit-scrollbar { width: 6px; }
     .messages-list::-webkit-scrollbar-track, .posts-list::-webkit-scrollbar-track, .users-list::-webkit-scrollbar-track { background: transparent; }
     .messages-list::-webkit-scrollbar-thumb, .posts-list::-webkit-scrollbar-thumb, .users-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-    /* MESAJ ITEM */
-    .message-item { display: flex; gap: 12px; align-items: flex-end; animation: fadeSlideIn .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .message-item { display: flex; gap: 12px; align-items: flex-end; animation: fadeSlideIn .3s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative; }
     .message-item.own { flex-direction: row-reverse; }
-    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--text-dim); flex-shrink: 0; font-family: var(--font-brand); border: 1px solid var(--border); }
+    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--text-dim); flex-shrink: 0; border: 1px solid var(--border); }
     .message-item.own .msg-avatar { display: none; }
-    .msg-bubble { max-width: 75%; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px 20px 20px 4px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    
+    .msg-bubble { max-width: 75%; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px 20px 20px 4px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; }
     .message-item.own .msg-bubble { background: linear-gradient(135deg, var(--accent), #4f46e5); border-color: transparent; border-radius: 20px 20px 4px 20px; color: #fff; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2); }
+    
     .msg-nick { font-size: .75rem; font-weight: 600; color: var(--accent2); margin-bottom: 6px; font-family: var(--font-mono); }
     .message-item.own .msg-nick { display: none; }
     .msg-text { font-size: 0.95rem; line-height: 1.5; word-break: break-word; }
     .msg-time { font-size: .7rem; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono); text-align: left; }
     .message-item.own .msg-time { color: rgba(255,255,255,0.7); text-align: right; }
 
-    /* INPUT KISIMLARI */
-    .message-input-area, .post-input-area {
-      padding: 16px 24px; background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 16px);
-    }
-    .post-input-area { flex-direction: column; }
-    .message-input-area textarea, .post-input-area textarea {
-      flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 24px; color: var(--text); font-family: var(--font-main); font-size: 1rem; padding: 14px 20px; outline: none; resize: none; min-height: 52px; transition: all .2s; line-height: 1.4; width: 100%;
-    }
-    .post-input-area textarea { border-radius: var(--radius); min-height: 80px; max-height: 160px; }
-    .message-input-area textarea:focus, .post-input-area textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    /* YENİ: Alıntılanan Mesaj Görünümü (Baloncuk İçi) */
+    .msg-quote-block { background: rgba(0,0,0,0.2); border-left: 3px solid var(--accent2); padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-dim); }
+    .message-item.own .msg-quote-block { background: rgba(255,255,255,0.15); border-left-color: #fff; color: rgba(255,255,255,0.9); }
+    .msg-quote-nick { font-weight: bold; font-size: 0.75rem; margin-bottom: 2px; }
+    
+    /* YENİ: Yanıtla Butonu */
+    .btn-reply { position: absolute; top: 50%; transform: translateY(-50%); opacity: 0; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; z-index: 10; }
+    .message-item:hover .btn-reply { opacity: 1; }
+    .message-item:not(.own) .btn-reply { right: -40px; }
+    .message-item.own .btn-reply { left: -40px; }
+    .btn-reply:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+    /* YENİ: Yazma Alanı ve Quote Preview & Mic */
+    .input-wrapper { display: flex; flex-direction: column; background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,0.05); padding: 12px 24px; padding-bottom: env(safe-area-inset-bottom, 12px); flex-shrink: 0; }
+    
+    .quote-preview { display: none; align-items: center; justify-content: space-between; background: var(--surface2); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem; }
+    .quote-preview-content { display: flex; flex-direction: column; overflow: hidden; }
+    .quote-preview-nick { font-weight: bold; color: var(--accent); font-size: 0.75rem; }
+    .quote-preview-text { color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .btn-close-quote { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 1.2rem; }
+    .btn-close-quote:hover { color: #ef4444; }
+
+    .message-input-row { display: flex; gap: 10px; align-items: flex-end; }
+    .message-input-row textarea { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 24px; color: var(--text); font-family: var(--font-main); font-size: 1rem; padding: 14px 20px; outline: none; resize: none; max-height: 120px; min-height: 52px; transition: all .2s; line-height: 1.4; }
+    .message-input-row textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    
+    .btn-mic { width: 52px; height: 52px; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; color: var(--text); font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .btn-mic:hover { background: var(--surface-solid); border-color: var(--accent); color: var(--accent); }
+    .btn-mic.recording { background: #ef4444; color: white; border-color: #ef4444; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
     .btn-send { width: 52px; height: 52px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 50%; color: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
     .btn-send:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
-    .btn-send:active { transform: scale(.94); }
-    .post-input-footer { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    .char-count { font-size: .8rem; color: var(--text-dim); font-family: var(--font-mono); }
-    .btn-post { background: linear-gradient(135deg, var(--accent2), #d946ef); border: none; border-radius: 999px; color: #fff; font-family: var(--font-main); font-size: 0.95rem; font-weight: 600; padding: 12px 28px; cursor: pointer; transition: all .2s; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); }
-    .btn-post:hover { transform: translateY(-2px); }
 
-    /* PAYLAŞIMLAR (POSTS) */
-    .post-card { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px; padding: 24px; animation: fadeSlideIn .3s ease; transition: all .2s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-    .post-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-    .post-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-    .post-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0; font-family: var(--font-brand); }
-    .post-meta { flex: 1; }
-    .post-nick { font-size: 1rem; font-weight: 600; color: var(--text); }
-    .post-time { font-size: .8rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px; }
-    .post-content { font-size: 1.05rem; line-height: 1.6; color: rgba(244, 244, 245, 0.9); white-space: pre-wrap; word-break: break-word; }
+    /* YENİ: Audio element stili */
+    audio { height: 36px; max-width: 220px; outline: none; border-radius: 20px; }
+    audio::-webkit-media-controls-panel { background-color: var(--surface2); }
+    .message-item.own audio::-webkit-media-controls-panel { background-color: rgba(255,255,255,0.2); color: white; }
 
-    /* ===== ÖZEL MESAJ (DM) EKRANI ===== */
-    .user-list-item {
-      display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--surface-solid);
-      border: 1px solid var(--border); border-radius: 16px; cursor: pointer; transition: all .2s;
-    }
+    /* Diğer alanlar (DM, Post, Toast) */
+    .users-list { flex: 1; }
+    .user-list-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 16px; cursor: pointer; transition: all .2s; }
     .user-list-item:hover { border-color: var(--accent); transform: translateY(-2px); }
     .user-list-nick { font-weight: 600; font-size: 1.05rem; flex: 1; color: var(--text); }
-    .dm-header {
-      display: flex; align-items: center; gap: 12px; padding: 12px 24px;
-      background: var(--surface2); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
-    }
+    .dm-header { display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: var(--surface2); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
     .btn-back { background: transparent; border: none; color: var(--text-dim); font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 0; }
     .btn-back:hover { color: var(--accent); }
     .dm-header-title { font-weight: 600; font-size: 1.1rem; color: var(--text); flex: 1; text-align: center; margin-right: 40px; }
 
-    /* BOŞ DURUM & TOAST & BADGE */
+    .post-input-area { padding: 20px 24px; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 12px; }
+    .post-input-area textarea { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-main); font-size: 1rem; padding: 16px; outline: none; resize: none; min-height: 80px; max-height: 160px; }
+    .post-input-footer { display: flex; justify-content: space-between; align-items: center; }
+    .btn-post { background: linear-gradient(135deg, var(--accent2), #d946ef); border: none; border-radius: 999px; color: #fff; padding: 12px 28px; cursor: pointer; font-weight: 600; }
+    
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-dim); text-align: center; padding: 40px; }
     .empty-state .empty-icon { font-size: 3.5rem; opacity: .5; margin-bottom: 10px; }
-    .empty-state p { font-size: 1rem; font-weight: 500; }
-    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--surface-solid); border: 1px solid var(--border); border-radius: 999px; padding: 12px 24px; font-size: .9rem; font-weight: 500; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.6); transition: transform .4s cubic-bezier(.34,1.56,.64,1); z-index: 9999; pointer-events: none; display: flex; align-items: center; gap: 10px; }
+    
+    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--surface-solid); border: 1px solid var(--border); border-radius: 999px; padding: 12px 24px; font-size: .9rem; font-weight: 500; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.6); transition: transform .4s cubic-bezier(.34,1.56,.64,1); z-index: 9999; }
     #toast.show { transform: translateX(-50%) translateY(0); }
-    .new-badge { display: inline-flex; align-items: center; justify-content: center; background: #ef4444; color: #fff; font-size: .7rem; font-weight: 700; border-radius: 999px; padding: 2px 8px; min-width: 20px; height: 20px; margin-left: 6px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
+    .new-badge { display: inline-flex; align-items: center; justify-content: center; background: #ef4444; color: #fff; font-size: .7rem; font-weight: 700; border-radius: 999px; padding: 2px 8px; min-width: 20px; height: 20px; margin-left: 6px; }
     
     @media (max-width: 600px) {
-      .login-card { padding: 32px 24px; border-radius: 20px; border-left: none; border-right: none; }
-      .app-header { padding: 12px 16px; }
-      .user-nick { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .btn-logout { padding: 6px 12px; font-size: 0.8rem; }
-      .msg-bubble { max-width: 85%; }
-      .tab-btn { font-size: .85rem; padding: 12px 4px; }
-      .messages-list, .posts-list, .users-list { padding: 16px; }
-      .message-input-area, .post-input-area { padding: 12px 16px; }
-      .dm-header { padding: 12px 16px; }
+      .input-wrapper { padding: 12px 16px; }
+      .message-item:not(.own) .btn-reply { right: -30px; }
+      .message-item.own .btn-reply { left: -30px; }
+      audio { max-width: 180px; }
     }
   </style>
 </head>
 <body>
 
-<!-- YÜKLEME EKRANI -->
 <div id="loading-screen">
-  <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-big" onerror="this.style.display='none'" />
+  <img src="logo.png" alt="İlim İrfan" class="logo-img-big" onerror="this.style.display='none'" />
   <div class="logo-big">İlim İrfan</div>
   <div class="spinner"></div>
 </div>
 
-<!-- GİRİŞ EKRANI -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-header">
-      <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-md" onerror="this.style.display='none'" />
+      <img src="logo.png" alt="İlim İrfan" class="logo-img-md" onerror="this.style.display='none'" />
       <div class="logo">İlim İrfan</div>
       <p>Aramıza katıl, bilgiyi paylaş.</p>
     </div>
-    <div class="input-group">
-      <label>Takma Ad (Nick)</label>
-      <input type="text" id="nick-input" placeholder="örn. bilge_kisi" maxlength="24" autocomplete="off" />
-    </div>
-    <div class="input-group">
-      <label>Parola</label>
-      <input type="password" id="password-input" placeholder="Parolanız" maxlength="50" />
-    </div>
+    <div class="input-group"><label>Takma Ad (Nick)</label><input type="text" id="nick-input" placeholder="örn. bilge_kisi" maxlength="24" /></div>
+    <div class="input-group"><label>Parola</label><input type="password" id="password-input" placeholder="Parolanız" /></div>
     <button class="btn-primary" id="login-btn">Giriş Yap / Kayıt Ol →</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
 
-<!-- ANA UYGULAMA -->
 <div id="app">
   <header class="app-header">
-    <div class="logo">
-      <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-sm" onerror="this.style.display='none'" />
-      <span>İlim İrfan</span>
-    </div>
+    <div class="logo"><img src="logo.png" alt="Logo" class="logo-img-sm" onerror="this.style.display='none'"/><span>İlim İrfan</span></div>
     <div class="header-right">
-      <div class="user-badge">
-        <div class="user-avatar" id="header-avatar"></div>
-        <span class="user-nick" id="header-nick"></span>
-      </div>
+      <div class="user-badge"><div class="user-avatar" id="header-avatar"></div><span class="user-nick" id="header-nick"></span></div>
       <button class="btn-logout" id="logout-btn">Çıkış</button>
     </div>
   </header>
 
-  <!-- SEKMELER -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="messages">
-      <span class="tab-icon">💬</span> Sohbet
-      <span class="new-badge" id="msg-badge" style="display:none"></span>
-    </button>
-    <button class="tab-btn" data-tab="dm">
-      <span class="tab-icon">👥</span> Kişiler
-      <span class="new-badge" id="dm-total-badge" style="display:none"></span>
-    </button>
-    <button class="tab-btn" data-tab="posts">
-      <span class="tab-icon">📜</span> Pano
-      <span class="new-badge" id="post-badge" style="display:none"></span>
-    </button>
+    <button class="tab-btn active" data-tab="messages"><span class="tab-icon">💬</span> Sohbet <span class="new-badge" id="msg-badge" style="display:none"></span></button>
+    <button class="tab-btn" data-tab="dm"><span class="tab-icon">👥</span> Kişiler <span class="new-badge" id="dm-total-badge" style="display:none"></span></button>
+    <button class="tab-btn" data-tab="posts"><span class="tab-icon">📜</span> Pano <span class="new-badge" id="post-badge" style="display:none"></span></button>
   </div>
 
   <!-- GENEL SOHBET -->
   <div class="tab-content active" id="tab-messages">
     <div class="messages-list" id="messages-list"></div>
-    <div class="message-input-area">
-      <textarea id="msg-input" placeholder="Genel sohbete yaz... (Enter ile gönder)" rows="1"></textarea>
-      <button class="btn-send" id="msg-send-btn">➤</button>
+    <div class="input-wrapper">
+      <div class="quote-preview" id="global-quote-preview">
+        <div class="quote-preview-content">
+          <span class="quote-preview-nick" id="global-quote-nick"></span>
+          <span class="quote-preview-text" id="global-quote-text"></span>
+        </div>
+        <button class="btn-close-quote" onclick="cancelQuote('global')">×</button>
+      </div>
+      <div class="message-input-row">
+        <textarea id="msg-input" placeholder="Sohbete yaz... (Enter ile gönder)" rows="1"></textarea>
+        <button class="btn-mic" id="global-mic-btn" onclick="toggleRecording('global')" title="Sesli Mesaj Gönder">🎙️</button>
+        <button class="btn-send" id="msg-send-btn">➤</button>
+      </div>
     </div>
   </div>
 
-  <!-- ÖZEL MESAJ (KİŞİLER) SEKME İÇERİĞİ -->
+  <!-- DM (ÖZEL MESAJ) -->
   <div class="tab-content" id="tab-dm">
-    <!-- Liste Görünümü -->
-    <div class="users-list" id="dm-user-list">
-       <div class="empty-state"><div class="spinner"></div><p>Kişiler yükleniyor...</p></div>
-    </div>
-    <!-- Özel Sohbet Görünümü (Başlangıçta gizli) -->
+    <div class="users-list" id="dm-user-list"></div>
     <div id="dm-chat-view" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
       <div class="dm-header">
         <button class="btn-back" id="dm-back-btn">← Geri</button>
         <div class="dm-header-title" id="dm-chat-title">Nick</div>
       </div>
       <div class="messages-list" id="dm-messages-list"></div>
-      <div class="message-input-area">
-        <textarea id="dm-input" placeholder="Fazla uzatma" rows="1"></textarea>
-        <button class="btn-send" id="dm-send-btn">➤</button>
+      <div class="input-wrapper">
+        <div class="quote-preview" id="dm-quote-preview">
+          <div class="quote-preview-content">
+            <span class="quote-preview-nick" id="dm-quote-nick"></span>
+            <span class="quote-preview-text" id="dm-quote-text"></span>
+          </div>
+          <button class="btn-close-quote" onclick="cancelQuote('dm')">×</button>
+        </div>
+        <div class="message-input-row">
+          <textarea id="dm-input" placeholder="Özel mesaj yaz... (Enter ile gönder)" rows="1"></textarea>
+          <button class="btn-mic" id="dm-mic-btn" onclick="toggleRecording('dm')" title="Sesli Mesaj Gönder">🎙️</button>
+          <button class="btn-send" id="dm-send-btn">➤</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- PANO (POSTS) -->
+  <!-- PANO -->
   <div class="tab-content" id="tab-posts">
     <div class="posts-list" id="posts-list"></div>
     <div class="post-input-area">
-      <textarea id="post-input" placeholder="Hangi derin düşüncelerdesin? Yaz, okuyalım..." rows="3" maxlength="1000"></textarea>
-      <div class="post-input-footer">
-        <span class="char-count"><span id="char-count">0</span>/1000</span>
-        <button class="btn-post" id="post-send-btn">📌 Paylaş</button>
-      </div>
+      <textarea id="post-input" placeholder="Hangi derin düşüncelerdesin? Yaz, okuyalım..." rows="3"></textarea>
+      <div class="post-input-footer"><span class="char-count"><span id="char-count">0</span>/1000</span><button class="btn-post" id="post-send-btn">📌 Paylaş</button></div>
     </div>
   </div>
 </div>
@@ -319,338 +259,266 @@
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentNick = localStorage.getItem('ilimirfan_nick') || null;
-  let activeTab   = 'messages';
-  let unreadMsgs  = 0, unreadPosts = 0, unreadDmTotal = 0;
-  let unreadDmMap = {}; // Hangi kullanıcıdan kaç yeni DM var? { 'ahmet': 2 }
+  let activeTab = 'messages', activeDmUser = null, allUsersList = [];
+  let unreadMsgs = 0, unreadPosts = 0, unreadDmTotal = 0, unreadDmMap = {};
   let isFirstLoadMsg = true, isFirstLoadPost = true;
-  
-  // DM State
-  let activeDmUser = null; // Şu an özel mesajlaşılan kişi
-  let allUsersList = []; // Sistemdeki kayıtlı kişiler
 
-  // XSS Koruması
-  function escape(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
-  function fmtTime(iso) { const d = new Date(iso), now = new Date(); const h = d.getHours().toString().padStart(2,'0'), m = d.getMinutes().toString().padStart(2,'0'); if (d.toDateString() === now.toDateString()) return `${h}:${m}`; return `${d.getDate()}/${d.getMonth()+1} ${h}:${m}`; }
+  // Alıntı (Quote) State
+  let quoteState = { global: null, dm: null }; 
+
+  // Ses Kaydı (Audio) State
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false;
+
+  function escape(str) { return String(str||'').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function fmtTime(iso) { const d = new Date(iso), now = new Date(), h = d.getHours().toString().padStart(2,'0'), m = d.getMinutes().toString().padStart(2,'0'); return d.toDateString() === now.toDateString() ? `${h}:${m}` : `${d.getDate()}/${d.getMonth()+1} ${h}:${m}`; }
   function initials(nick) { return escape(nick.slice(0,2).toUpperCase()); }
   function showToast(msg, duration = 3000) { const t = document.getElementById('toast'); t.innerHTML = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), duration); }
   function hideLoading() { const s = document.getElementById('loading-screen'); s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 500); }
   function scrollToBottom(id) { const el = document.getElementById(id); if(el) el.scrollTop = el.scrollHeight; }
-  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 
-  // Şifreleme (Hash)
-  async function hashPassword(password) {
-    const msgBuffer = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  // ================= GİRİŞ & ÇIKIŞ =================
+  // Giriş işlemleri vb.
+  async function hashPassword(p) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  
   async function login() {
-    const nick = document.getElementById('nick-input').value.trim();
-    const pass = document.getElementById('password-input').value.trim();
-    const errEl = document.getElementById('login-error'); errEl.textContent = '';
-
-    if (!nick) { errEl.textContent = 'Nick boş olamaz.'; return; }
-    if (nick.length < 2) { errEl.textContent = 'Nick en az 2 karakter olmalı.'; return; }
-    if (!/^[a-zA-ZğüşöçıĞÜŞÖÇİ0-9_. -]+$/.test(nick)) { errEl.textContent = 'Nick yalnızca harf, rakam, _, . ve - içerebilir.'; return; }
-    if (!pass) { errEl.textContent = 'Parola boş olamaz.'; return; }
-    if (pass.length < 4) { errEl.textContent = 'Parola en az 4 karakter olmalı.'; return; }
-
+    const nick = document.getElementById('nick-input').value.trim(), pass = document.getElementById('password-input').value.trim(), errEl = document.getElementById('login-error');
+    if (!nick || nick.length < 2) return errEl.textContent = 'Nick geçersiz.'; if (!pass || pass.length < 4) return errEl.textContent = 'Parola kısa.';
     const btn = document.getElementById('login-btn'); btn.textContent = 'Bağlanıyor...'; btn.disabled = true;
-
     try {
       const hashedPass = await hashPassword(pass);
-      const { data: users, error: fetchError } = await db.from('users').select('password').eq('nick', nick);
-      if (fetchError) throw fetchError;
-
+      const { data: users } = await db.from('users').select('password').eq('nick', nick);
       if (users && users.length > 0) {
-        if (users[0].password !== hashedPass) {
-          errEl.textContent = 'Hatalı parola! Eski hesabınsa yöneticiden silmesini iste.';
-          btn.textContent = 'Giriş Yap / Kayıt Ol →'; btn.disabled = false; return;
-        }
+        if (users[0].password !== hashedPass) { btn.textContent = 'Giriş Yap'; btn.disabled=false; return errEl.textContent = 'Hatalı parola!'; }
       } else {
-        const { error: insertError } = await db.from('users').insert([{ nick: nick, password: hashedPass }]);
-        if (insertError) throw insertError;
-        showToast('✨ Hesabın başarıyla oluşturuldu!');
+        await db.from('users').insert([{ nick, password: hashedPass }]); showToast('✨ Hesap açıldı!');
       }
-
-      currentNick = nick; localStorage.setItem('ilimirfan_nick', nick);
-      document.getElementById('password-input').value = '';
-      showApp();
-
-    } catch (err) { errEl.textContent = 'Sunucu hatası: ' + err.message; }
-    finally { btn.textContent = 'Giriş Yap / Kayıt Ol →'; btn.disabled = false; }
+      currentNick = nick; localStorage.setItem('ilimirfan_nick', nick); document.getElementById('password-input').value = ''; showApp();
+    } catch(e) { errEl.textContent = 'Hata: '+e.message; btn.disabled=false; btn.textContent='Giriş Yap'; }
   }
 
-  function logout() {
-    currentNick = null; localStorage.removeItem('ilimirfan_nick');
-    document.getElementById('app').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('nick-input').value = ''; document.getElementById('password-input').value = '';
-    isFirstLoadMsg = true; isFirstLoadPost = true; activeDmUser = null;
-    unreadMsgs = 0; unreadPosts = 0; unreadDmTotal = 0; unreadDmMap = {}; updateBadges();
-  }
+  function logout() { currentNick=null; localStorage.clear(); location.reload(); }
 
   function showApp() {
-    document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'flex';
-    document.getElementById('header-nick').textContent = currentNick; document.getElementById('header-avatar').innerHTML = initials(currentNick);
+    document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='flex';
+    document.getElementById('header-nick').textContent=currentNick; document.getElementById('header-avatar').innerHTML=initials(currentNick);
     loadMessages(); loadPosts(); fetchAllUsers(); subscribeRealtime();
   }
 
-  // ================= SEKMELER =================
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab; activeTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active'); document.getElementById('tab-' + tab).classList.add('active');
-      
-      if (tab === 'messages') { unreadMsgs = 0; updateBadges(); scrollToBottom('messages-list'); }
-      if (tab === 'posts')    { unreadPosts = 0; updateBadges(); }
-      if (tab === 'dm')       {
-        if (activeDmUser === null) fetchAllUsers(); // Kişiler listesini yenile
-        else scrollToBottom('dm-messages-list');
-      }
-    });
-  });
-
-  function updateBadges() {
-    const mb = document.getElementById('msg-badge'), pb = document.getElementById('post-badge'), dmb = document.getElementById('dm-total-badge');
-    if (unreadMsgs > 0) { mb.style.display = ''; mb.textContent = unreadMsgs > 99 ? '99+' : unreadMsgs; } else mb.style.display = 'none';
-    if (unreadPosts > 0) { pb.style.display = ''; pb.textContent = unreadPosts > 99 ? '99+' : unreadPosts; } else pb.style.display = 'none';
-    
-    // DM Unread Total Hesapla
-    unreadDmTotal = Object.values(unreadDmMap).reduce((a, b) => a + b, 0);
-    if (unreadDmTotal > 0) { dmb.style.display = ''; dmb.textContent = unreadDmTotal > 99 ? '99+' : unreadDmTotal; } else dmb.style.display = 'none';
+  // ================= ALINTI FONKSİYONLARI =================
+  function setQuote(nick, content, isAudio, context) {
+    quoteState[context] = { nick, content: isAudio ? '🎙️ Sesli Mesaj' : content };
+    document.getElementById(`${context}-quote-preview`).style.display = 'flex';
+    document.getElementById(`${context}-quote-nick`).textContent = nick + ' yanıtlanıyor:';
+    document.getElementById(`${context}-quote-text`).textContent = quoteState[context].content;
+    document.getElementById(`${context === 'global' ? 'msg' : 'dm'}-input`).focus();
+  }
+  function cancelQuote(context) {
+    quoteState[context] = null;
+    document.getElementById(`${context}-quote-preview`).style.display = 'none';
   }
 
-  // ================= GENEL SOHBET =================
-  async function loadMessages() {
-    const { data, error } = await db.from('messages').select('*').order('created_at', { ascending: true }).limit(200);
-    if (error) return;
-    const list = document.getElementById('messages-list'); list.innerHTML = '';
-    if (!data.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sessizlik hakim... İlk kelamı sen et!</p></div>`; return; }
-    data.forEach(m => appendHtmlMessage(m, 'messages-list'));
-    setTimeout(() => scrollToBottom('messages-list'), 100); isFirstLoadMsg = false;
-  }
-
-  async function sendGlobalMessage() {
-    const inp = document.getElementById('msg-input'); const content = inp.value.trim();
-    if (!content) return; inp.value = ''; inp.style.height = '';
-    const { error } = await db.from('messages').insert({ nick: currentNick, content });
-    if (error) showToast('⚠️ Gönderilemedi: ' + error.message);
-  }
-
-  // ================= ÖZEL MESAJ (DM) =================
-  
-  // 1. Kullanıcı Listesini Çek ve Ekrana Çiz
-  async function fetchAllUsers() {
-    const { data, error } = await db.from('users').select('nick').order('created_at', { ascending: false });
-    if (error) return;
-    allUsersList = data.filter(u => u.nick !== currentNick); // Kendimizi listeden çıkarıyoruz
-    renderUserList();
-  }
-
-  function renderUserList() {
-    const list = document.getElementById('dm-user-list');
-    if (allUsersList.length === 0) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>Grupta henüz başka kimse yok.</p></div>`;
+  // ================= SES KAYDI FONKSİYONLARI =================
+  async function toggleRecording(context) {
+    const btn = document.getElementById(`${context}-mic-btn`);
+    if (isRecording) {
+      mediaRecorder.stop();
+      isRecording = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎙️';
+      showToast('Kayıt tamamlandı, gönderiliyor...', 2000);
       return;
     }
-    list.innerHTML = '';
-    allUsersList.forEach(user => {
-      const unreadCount = unreadDmMap[user.nick] || 0;
-      const badgeHtml = unreadCount > 0 ? `<span class="dm-unread-badge">${unreadCount}</span>` : '';
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
       
-      const div = document.createElement('div');
-      div.className = 'user-list-item';
-      div.innerHTML = `
-        <div class="post-avatar" style="width:36px;height:36px;">${initials(user.nick)}</div>
-        <div class="user-list-nick">${escape(user.nick)}</div>
-        ${badgeHtml}
-      `;
-      div.onclick = () => openPrivateChat(user.nick);
-      list.appendChild(div);
-    });
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        stream.getTracks().forEach(t => t.stop()); // Mikrofonu kapat
+        await uploadAudioAndSend(audioBlob, context);
+      };
+      
+      mediaRecorder.start();
+      isRecording = true;
+      btn.classList.add('recording');
+      btn.textContent = '⏹️';
+    } catch (err) {
+      showToast('⚠️ Mikrofon izni alınamadı!');
+      console.error(err);
+    }
   }
 
-  // 2. Özel Sohbet Ekranını Aç
-  async function openPrivateChat(otherNick) {
-    activeDmUser = otherNick;
-    document.getElementById('dm-user-list').style.display = 'none';
-    document.getElementById('dm-chat-view').style.display = 'flex';
-    document.getElementById('dm-chat-title').textContent = escape(otherNick);
-    
-    // Okunmamışları sıfırla
-    if (unreadDmMap[otherNick]) {
-      delete unreadDmMap[otherNick];
-      updateBadges();
-    }
+  async function uploadAudioAndSend(blob, context) {
+    const fileName = `${currentNick}_${Date.now()}.webm`;
+    // Storage'a yükle
+    const { error: uploadErr } = await db.storage.from('audio').upload(fileName, blob, { contentType: 'audio/webm' });
+    if (uploadErr) return showToast('⚠️ Ses yüklenemedi: ' + uploadErr.message);
 
-    // Mesajları çek
-    const list = document.getElementById('dm-messages-list');
-    list.innerHTML = `<div class="empty-state"><div class="spinner" style="width:24px;height:24px;"></div><p>Mesajlar yükleniyor...</p></div>`;
-    
-    const { data, error } = await db.from('private_messages')
-      .select('*')
-      .or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${activeDmUser}),and(sender_nick.eq.${activeDmUser},receiver_nick.eq.${currentNick})`)
-      .order('created_at', { ascending: true })
-      .limit(100);
+    // Public URL al
+    const { data } = db.storage.from('audio').getPublicUrl(fileName);
+    const audioUrl = `[AUDIO]${data.publicUrl}`;
 
-    list.innerHTML = '';
-    if (error) { list.innerHTML = `<p style="color:red;padding:20px;">Hata: ${error.message}</p>`; return; }
-    
-    if (data.length === 0) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">✉️</div><p>${escape(otherNick)} ile aranda hiç mesaj yok.</p></div>`;
+    // Mesaj olarak gönder
+    if (context === 'global') {
+      await db.from('messages').insert({ nick: currentNick, content: audioUrl, quoted_nick: quoteState.global?.nick, quoted_content: quoteState.global?.content });
+      cancelQuote('global');
     } else {
-      data.forEach(m => appendHtmlMessage(m, 'dm-messages-list'));
+      await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: audioUrl, quoted_nick: quoteState.dm?.nick, quoted_content: quoteState.dm?.content });
+      cancelQuote('dm');
     }
-    setTimeout(() => scrollToBottom('dm-messages-list'), 100);
   }
 
-  // 3. Geri Dön
-  document.getElementById('dm-back-btn').addEventListener('click', () => {
-    activeDmUser = null;
-    document.getElementById('dm-chat-view').style.display = 'none';
-    document.getElementById('dm-user-list').style.display = 'flex';
-    renderUserList(); // Listeyi rozetler güncel haliyle yeniden çiz
-  });
-
-  // 4. Özel Mesaj Gönder
-  async function sendPrivateMessage() {
-    const inp = document.getElementById('dm-input'); const content = inp.value.trim();
-    if (!content || !activeDmUser) return; 
-    inp.value = ''; inp.style.height = '';
-    const { error } = await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: content });
-    if (error) showToast('⚠️ Gönderilemedi: ' + error.message);
-  }
-
-  // ================= ORTAK MESAJ BALONCUK OLUŞTURUCU =================
-  // Hem genel sohbet hem de özel mesaj listeleri için aynı baloncuk yapısını kullanırız.
+  // ================= MESAJ OLUŞTURUCU (GENEL + DM) =================
   function appendHtmlMessage(m, listId) {
     const list = document.getElementById(listId);
     if (list.querySelector('.empty-state')) list.innerHTML = '';
     
-    // Genel sohbette m.nick vardır, private_messages tablosunda ise sender_nick.
     const sender = m.nick || m.sender_nick; 
     const isOwn = sender === currentNick;
+    const isAudio = m.content.startsWith('[AUDIO]');
+    const actualContent = isAudio ? m.content.replace('[AUDIO]', '') : escape(m.content).replace(/\n/g, '<br>');
+    const context = listId === 'messages-list' ? 'global' : 'dm';
+
+    let contentHtml = isAudio 
+      ? `<audio controls src="${escape(actualContent)}"></audio>` 
+      : `<div class="msg-text">${actualContent}</div>`;
+
+    let quoteHtml = '';
+    if (m.quoted_nick && m.quoted_content) {
+      quoteHtml = `
+        <div class="msg-quote-block">
+          <div class="msg-quote-nick">${escape(m.quoted_nick)}</div>
+          <div>${escape(m.quoted_content)}</div>
+        </div>`;
+    }
 
     const div = document.createElement('div'); div.className = 'message-item' + (isOwn ? ' own' : '');
-    div.innerHTML = `<div class="msg-avatar">${initials(sender)}</div><div class="msg-bubble"><div class="msg-nick">${escape(sender)}</div><div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div><div class="msg-time">${fmtTime(m.created_at)}</div></div>`;
+    div.innerHTML = `
+      <button class="btn-reply" onclick="setQuote('${escape(sender)}', '${isAudio ? '' : escape(m.content)}', ${isAudio}, '${context}')">↩</button>
+      <div class="msg-avatar">${initials(sender)}</div>
+      <div class="msg-bubble">
+        <div class="msg-nick">${escape(sender)}</div>
+        ${quoteHtml}
+        ${contentHtml}
+        <div class="msg-time">${fmtTime(m.created_at)}</div>
+      </div>`;
+      
     list.appendChild(div);
-    if (list.scrollHeight - list.scrollTop - list.clientHeight < 150 || isOwn || isFirstLoadMsg) scrollToBottom(listId);
+    if (list.scrollHeight - list.scrollTop - list.clientHeight < 180 || isOwn) scrollToBottom(listId);
   }
 
-  // ================= PAYLAŞIMLAR =================
+  // ================= VERİ ÇEKME & GÖNDERME =================
+  async function loadMessages() {
+    const { data } = await db.from('messages').select('*').order('created_at', { ascending: true }).limit(100);
+    const list = document.getElementById('messages-list'); list.innerHTML='';
+    if (!data || !data.length) return list.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sessizlik hakim...</p></div>`;
+    data.forEach(m => appendHtmlMessage(m, 'messages-list')); setTimeout(()=>scrollToBottom('messages-list'),100); isFirstLoadMsg=false;
+  }
+
+  async function sendGlobalMessage() {
+    const inp = document.getElementById('msg-input'), content = inp.value.trim(); if (!content) return;
+    inp.value=''; inp.style.height='';
+    await db.from('messages').insert({ nick: currentNick, content, quoted_nick: quoteState.global?.nick, quoted_content: quoteState.global?.content });
+    cancelQuote('global');
+  }
+
+  async function fetchAllUsers() {
+    const { data } = await db.from('users').select('nick').order('created_at', { ascending: false });
+    if(data) { allUsersList = data.filter(u => u.nick !== currentNick); renderUserList(); }
+  }
+
+  function renderUserList() {
+    const list = document.getElementById('dm-user-list'); list.innerHTML='';
+    if (!allUsersList.length) return list.innerHTML = `<div class="empty-state"><p>Kimse yok.</p></div>`;
+    allUsersList.forEach(u => {
+      const b = unreadDmMap[u.nick] || 0;
+      const div = document.createElement('div'); div.className='user-list-item';
+      div.innerHTML=`<div class="post-avatar" style="width:36px;height:36px">${initials(u.nick)}</div><div class="user-list-nick">${escape(u.nick)}</div>${b>0?`<span class="new-badge">${b}</span>`:''}`;
+      div.onclick = () => openPrivateChat(u.nick); list.appendChild(div);
+    });
+  }
+
+  async function openPrivateChat(otherNick) {
+    activeDmUser = otherNick; cancelQuote('dm');
+    document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex';
+    document.getElementById('dm-chat-title').textContent=otherNick;
+    if (unreadDmMap[otherNick]) { delete unreadDmMap[otherNick]; updateBadges(); }
+    const list = document.getElementById('dm-messages-list'); list.innerHTML='';
+    const { data } = await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${activeDmUser}),and(sender_nick.eq.${activeDmUser},receiver_nick.eq.${currentNick})`).order('created_at', { ascending: true }).limit(100);
+    if(!data || !data.length) list.innerHTML = `<div class="empty-state"><p>Mesaj yok.</p></div>`; else data.forEach(m => appendHtmlMessage(m, 'dm-messages-list'));
+    setTimeout(()=>scrollToBottom('dm-messages-list'),100);
+  }
+
+  document.getElementById('dm-back-btn').addEventListener('click', () => { activeDmUser=null; document.getElementById('dm-chat-view').style.display='none'; document.getElementById('dm-user-list').style.display='flex'; renderUserList(); });
+
+  async function sendPrivateMessage() {
+    const inp = document.getElementById('dm-input'), content = inp.value.trim(); if (!content || !activeDmUser) return;
+    inp.value=''; inp.style.height='';
+    await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content, quoted_nick: quoteState.dm?.nick, quoted_content: quoteState.dm?.content });
+    cancelQuote('dm');
+  }
+
+  // PANO
   async function loadPosts() {
-    const { data, error } = await db.from('posts').select('*').order('created_at', { ascending: false }).limit(100);
-    if (error) return;
-    const list = document.getElementById('posts-list'); list.innerHTML = '';
-    if (!data.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><p>Henüz bir kelam paylaşılmamış. İlmini bizimle paylaş!</p></div>`; return; }
-    data.forEach(p => appendPost(p, false)); isFirstLoadPost = false;
+    const { data } = await db.from('posts').select('*').order('created_at', { ascending: false }).limit(50);
+    const list = document.getElementById('posts-list'); list.innerHTML='';
+    if(data) data.forEach(p => { const div=document.createElement('div'); div.className='post-card'; div.innerHTML=`<div class="post-header"><div class="post-avatar">${initials(p.nick)}</div><div class="post-meta"><div class="post-nick">${escape(p.nick)}</div><div class="post-time">${fmtTime(p.created_at)}</div></div></div><div class="post-content">${escape(p.content)}</div>`; list.appendChild(div); });
   }
+  document.getElementById('post-send-btn').addEventListener('click', async () => {
+    const inp = document.getElementById('post-input'), content = inp.value.trim(); if(!content) return;
+    await db.from('posts').insert({ nick: currentNick, content }); inp.value=''; showToast('Pano güncellendi!');
+  });
 
-  function appendPost(p, prepend = true) {
-    const list = document.getElementById('posts-list');
-    if (list.querySelector('.empty-state')) list.innerHTML = '';
-    const div = document.createElement('div'); div.className = 'post-card';
-    div.innerHTML = `<div class="post-header"><div class="post-avatar">${initials(p.nick)}</div><div class="post-meta"><div class="post-nick">${escape(p.nick)}</div><div class="post-time">${fmtTime(p.created_at)}</div></div></div><div class="post-content">${escape(p.content)}</div>`;
-    prepend ? list.prepend(div) : list.appendChild(div);
-  }
-
-  async function sendPost() {
-    const inp = document.getElementById('post-input'); const content = inp.value.trim();
-    if (!content) return;
-    const btn = document.getElementById('post-send-btn'); btn.disabled = true; btn.style.opacity = "0.7";
-    const { error } = await db.from('posts').insert({ nick: currentNick, content });
-    btn.disabled = false; btn.style.opacity = "1";
-    if (error) showToast('⚠️ Gönderilemedi: ' + error.message);
-    else { showToast('✨ İrfan panosuna eklendi!'); inp.value = ''; document.getElementById('char-count').textContent = '0'; }
-  }
-
-  // ================= REALTIME (CANLI GÜNCELLEMELER) =================
+  // REALTIME
   function subscribeRealtime() {
-    // Genel Sohbet Dinleyici
-    db.channel('public-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-      if (isFirstLoadMsg) return; appendHtmlMessage(payload.new, 'messages-list');
-      if (activeTab !== 'messages' && payload.new.nick !== currentNick) {
-        unreadMsgs++; updateBadges(); showToast(`💬 <b>${escape(payload.new.nick)}</b> genel sohbete yazdı.`);
-      }
+    db.channel('public-messages').on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, p => {
+      if(isFirstLoadMsg) return; appendHtmlMessage(p.new, 'messages-list');
+      if(activeTab!=='messages' && p.new.nick!==currentNick) { unreadMsgs++; updateBadges(); showToast(`💬 ${escape(p.new.nick)} yazdı.`); }
     }).subscribe();
 
-    // Panoya Düşen Paylaşımlar Dinleyici
-    db.channel('public-posts').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-      if (isFirstLoadPost) return; appendPost(payload.new, true);
-      if (activeTab !== 'posts' && payload.new.nick !== currentNick) {
-        unreadPosts++; updateBadges(); showToast(`📜 <b>${escape(payload.new.nick)}</b> panoya yeni bir yazı astı!`);
-      }
-    }).subscribe();
-
-    // Özel Mesajlar (DM) Dinleyici
-    db.channel('public-private-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'private_messages' }, payload => {
-      const pm = payload.new;
-      // Eğer bu DM bizimle alakalıysa (gönderen biz veya alıcı biz)
-      if (pm.sender_nick === currentNick || pm.receiver_nick === currentNick) {
-        // Şu an bu mesajın sahibiyle mi sohbet ekranındayız?
-        const otherPerson = pm.sender_nick === currentNick ? pm.receiver_nick : pm.sender_nick;
-        
-        if (activeDmUser === otherPerson) {
-          // Eğer ekran açıksa sadece mesajı ekle
+    db.channel('public-private-messages').on('postgres_changes', { event:'INSERT', schema:'public', table:'private_messages' }, p => {
+      const pm = p.new;
+      if(pm.sender_nick===currentNick || pm.receiver_nick===currentNick) {
+        if(activeDmUser===(pm.sender_nick===currentNick?pm.receiver_nick:pm.sender_nick)) {
           appendHtmlMessage(pm, 'dm-messages-list');
-          // Bizim attığımız mesaj değilse ve tab aktifse görüldü yap
-          if (pm.receiver_nick === currentNick && activeTab !== 'dm') {
-             unreadDmMap[pm.sender_nick] = (unreadDmMap[pm.sender_nick] || 0) + 1;
-             updateBadges(); showToast(`📩 <b>${escape(pm.sender_nick)}</b> sana mesaj gönderdi!`);
-          }
-        } else if (pm.receiver_nick === currentNick) {
-          // Ekran açık değilse ve bize mesaj gelmişse bildirim düşür
-          unreadDmMap[pm.sender_nick] = (unreadDmMap[pm.sender_nick] || 0) + 1;
-          updateBadges();
-          
-          if(activeTab === 'dm') renderUserList(); // DM sekmesindeysek listeyi rozet için güncelle
-          showToast(`📩 <b>${escape(pm.sender_nick)}</b> sana özel bir mesaj gönderdi!`);
+          if(pm.receiver_nick===currentNick && activeTab!=='dm') { unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); showToast(`📩 ${escape(pm.sender_nick)} DM attı!`); }
+        } else if(pm.receiver_nick===currentNick) {
+          unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges();
+          if(activeTab==='dm') renderUserList(); showToast(`📩 ${escape(pm.sender_nick)} DM attı!`);
         }
       }
     }).subscribe();
 
-    // Yeni kullanıcılar katılırsa DM listesini sessizce güncelle (Sayfayı yenilemeden kişiyi görebilmek için)
-    db.channel('public-users').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, payload => {
-      if(payload.new.nick !== currentNick) {
-        // Listeye ekle (eğer zaten yoksa)
-        if(!allUsersList.find(u => u.nick === payload.new.nick)) {
-          allUsersList.unshift(payload.new);
-          if (activeTab === 'dm' && activeDmUser === null) renderUserList();
-        }
-      }
-    }).subscribe();
+    db.channel('public-posts').on('postgres_changes', { event:'INSERT', schema:'public', table:'posts' }, () => { loadPosts(); if(activeTab!=='posts') { unreadPosts++; updateBadges(); showToast('📜 Panoya yazı asıldı!'); } }).subscribe();
   }
 
-  // ================= EVENT LİSTENERS =================
+  // EVENT DİNLEYİCİLER (SEKMELER, TIKLAMALAR)
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+    const tab=btn.dataset.tab; activeTab=tab; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+tab).classList.add('active');
+    if(tab==='messages'){ unreadMsgs=0; updateBadges(); scrollToBottom('messages-list'); }
+    if(tab==='dm'){ if(!activeDmUser) fetchAllUsers(); else scrollToBottom('dm-messages-list'); }
+    if(tab==='posts'){ unreadPosts=0; updateBadges(); }
+  }));
+
+  function updateBadges() {
+    const mb=document.getElementById('msg-badge'), pb=document.getElementById('post-badge'), dmb=document.getElementById('dm-total-badge');
+    mb.style.display=unreadMsgs>0?'':'none'; mb.textContent=unreadMsgs; pb.style.display=unreadPosts>0?'':'none'; pb.textContent=unreadPosts;
+    unreadDmTotal=Object.values(unreadDmMap).reduce((a,b)=>a+b,0); dmb.style.display=unreadDmTotal>0?'':'none'; dmb.textContent=unreadDmTotal;
+  }
+
   document.getElementById('login-btn').addEventListener('click', login);
-  document.getElementById('nick-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password-input').focus(); });
-  document.getElementById('password-input').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
   document.getElementById('logout-btn').addEventListener('click', logout);
-  
-  // Genel Sohbet Enter 
   document.getElementById('msg-send-btn').addEventListener('click', sendGlobalMessage);
-  document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendGlobalMessage(); } });
-  document.getElementById('msg-input').addEventListener('input', function() { autoResize(this); });
-  
-  // DM Enter
+  document.getElementById('msg-input').addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendGlobalMessage(); }});
   document.getElementById('dm-send-btn').addEventListener('click', sendPrivateMessage);
-  document.getElementById('dm-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPrivateMessage(); } });
-  document.getElementById('dm-input').addEventListener('input', function() { autoResize(this); });
+  document.getElementById('dm-input').addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendPrivateMessage(); }});
 
-  // Pano Input
-  document.getElementById('post-send-btn').addEventListener('click', sendPost);
-  document.getElementById('post-input').addEventListener('input', function() { document.getElementById('char-count').textContent = this.value.length; });
-
-  // Başlat
-  (async function init() {
-    setTimeout(hideLoading, 500);
-    if (currentNick) { document.getElementById('login-screen').style.display = 'none'; showApp(); } 
-    else { document.getElementById('login-screen').style.display = 'flex'; }
-  })();
+  (async function init() { setTimeout(hideLoading, 500); if(currentNick) { document.getElementById('login-screen').style.display='none'; showApp(); } else document.getElementById('login-screen').style.display='flex'; })();
 </script>
 </body>
 </html>

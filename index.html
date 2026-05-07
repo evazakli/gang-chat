@@ -9,20 +9,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ========== KENDİ BİLGİLERİNİ BURAYA YAZMA, AŞAĞIDA JS BÖLÜMÜNDE DEĞİŞTİR ========== */
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #09090b; /* Zinc 950 */
-      --surface:   rgba(24, 24, 27, 0.7); /* Zinc 900 transparent */
+      --bg:        #09090b; 
+      --surface:   rgba(24, 24, 27, 0.7); 
       --surface-solid: #18181b;
-      --surface2:  #27272a; /* Zinc 800 */
-      --border:    #3f3f46; /* Zinc 700 */
-      --accent:    #6366f1; /* Indigo 500 */
+      --surface2:  #27272a; 
+      --border:    #3f3f46; 
+      --accent:    #6366f1; 
       --accent-hover:#4f46e5;
-      --accent2:   #a855f7; /* Purple 500 */
-      --text:      #f4f4f5; /* Zinc 50 */
-      --text-dim:  #a1a1aa; /* Zinc 400 */
+      --accent2:   #a855f7; 
+      --text:      #f4f4f5; 
+      --text-dim:  #a1a1aa; 
       --radius:    16px;
       --font-brand:'Syne', sans-serif;
       --font-main: 'Inter', sans-serif;
@@ -30,202 +29,139 @@
     }
 
     html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-main);
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
+      height: 100%; background: var(--bg); color: var(--text);
+      font-family: var(--font-main); overflow: hidden; -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== ÖZEL LOGO AYARLARI ===== */
+    .logo-img-big {
+      width: 120px; 
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.4));
+      margin-bottom: -10px; /* Yazı ile arasını daraltmak için */
+    }
+    .logo-img-md {
+      width: 80px;
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+    .logo-img-sm {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
     }
 
     /* ===== YÜKLEME EKRANI ===== */
     #loading-screen {
-      position: fixed; inset: 0;
-      background: var(--bg);
+      position: fixed; inset: 0; background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 20px;
-      z-index: 9999;
-      transition: opacity .5s ease;
+      flex-direction: column; gap: 20px; z-index: 9999; transition: opacity .5s ease;
     }
     #loading-screen .logo-big {
-      font-family: var(--font-brand);
-      font-size: 2.5rem; font-weight: 800;
+      font-family: var(--font-brand); font-size: 2.5rem; font-weight: 800;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: -1px;
-      text-align: center;
-      padding: 0 20px;
+      letter-spacing: -1px; text-align: center; padding: 0 20px;
     }
     .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--surface2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
+      width: 40px; height: 40px; border: 3px solid var(--surface2);
+      border-top-color: var(--accent); border-radius: 50%;
       animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ===== GİRİŞ EKRANI ===== */
     #login-screen {
-      position: fixed; inset: 0;
-      display: none; align-items: center; justify-content: center;
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
       background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%), var(--bg);
-      z-index: 100;
-      padding: 24px;
+      z-index: 100; padding: 24px;
     }
     .login-card {
-      width: 100%; max-width: 400px;
-      background: var(--surface-solid);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 48px 32px;
-      display: flex; flex-direction: column; gap: 28px;
+      width: 100%; max-width: 400px; background: var(--surface-solid);
+      border: 1px solid var(--border); border-radius: 24px; padding: 48px 32px;
+      display: flex; flex-direction: column; gap: 24px;
       box-shadow: 0 32px 64px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,0.05);
     }
-    .login-header { text-align: center; }
+    .login-header { text-align: center; display: flex; flex-direction: column; align-items: center; }
     .login-header .logo {
-      font-family: var(--font-brand);
-      font-size: 2.2rem; font-weight: 800;
+      font-family: var(--font-brand); font-size: 2.2rem; font-weight: 800;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: -1px;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;
     }
-    .login-header p {
-      color: var(--text-dim); font-size: 0.95rem; margin-top: 8px;
-    }
+    .login-header p { color: var(--text-dim); font-size: 0.95rem; margin-top: 8px; }
     .input-group { display: flex; flex-direction: column; gap: 10px; }
     .input-group label {
-      font-size: .85rem; font-weight: 600;
-      color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;
+      font-size: .85rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;
     }
     .input-group input {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 1.05rem;
-      padding: 16px;
-      outline: none;
-      transition: all .2s ease;
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text); font-family: var(--font-mono); font-size: 1.05rem;
+      padding: 16px; outline: none; transition: all .2s ease;
     }
-    .input-group input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-    }
+    .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      border: none; border-radius: var(--radius);
-      font-family: var(--font-main);
-      font-size: 1.05rem; font-weight: 600;
-      padding: 16px;
-      cursor: pointer;
-      transition: all .2s ease;
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
+      border: none; border-radius: var(--radius); font-family: var(--font-main);
+      font-size: 1.05rem; font-weight: 600; padding: 16px; cursor: pointer;
+      transition: all .2s ease; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); margin-top: 8px;
     }
-    .btn-primary:hover { 
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4); }
     .btn-primary:active { transform: translateY(0); }
-    .login-error {
-      color: #ef4444; font-size: .85rem;
-      text-align: center; min-height: 20px; font-weight: 500;
-    }
+    .login-error { color: #ef4444; font-size: .85rem; text-align: center; min-height: 20px; font-weight: 500; }
 
     /* ===== ANA EKRAN ===== */
     #app {
-      display: none;
-      flex-direction: column;
-      height: 100dvh;
-      overflow: hidden;
+      display: none; flex-direction: column; height: 100dvh; overflow: hidden;
       background: radial-gradient(circle at top center, rgba(99, 102, 241, 0.05), transparent 50%), var(--bg);
     }
 
     /* HEADER */
     .app-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 24px;
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      flex-shrink: 0;
-      gap: 12px;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; padding: 16px 24px;
+      background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; gap: 12px; z-index: 10;
     }
     .app-header .logo { 
-      font-family: var(--font-brand);
-      font-size: clamp(1rem, 4vw, 1.4rem); 
-      font-weight: 800; 
-      letter-spacing: -0.5px; 
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-brand); font-size: clamp(1rem, 4vw, 1.4rem); font-weight: 800; letter-spacing: -0.5px; 
     }
     .app-header .logo span {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .header-right {
-      display: flex; align-items: center; gap: 12px;
-    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
     .user-badge {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 16px 6px 6px;
+      display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); border-radius: 999px; padding: 6px 16px 6px 6px;
     }
     .user-avatar {
       width: 28px; height: 28px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: .8rem; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-      font-family: var(--font-brand);
+      display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; color: #fff;
+      flex-shrink: 0; font-family: var(--font-brand);
     }
     .user-nick { font-size: .85rem; font-weight: 500; font-family: var(--font-mono); }
     .btn-logout {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text-dim);
-      font-family: var(--font-main);
-      font-size: .85rem; font-weight: 500;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: all .2s;
+      background: transparent; border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text-dim); font-family: var(--font-main); font-size: .85rem; font-weight: 500;
+      padding: 8px 16px; cursor: pointer; transition: all .2s;
     }
-    .btn-logout:hover { 
-      border-color: #ef4444; color: #ef4444; 
-      background: rgba(239, 68, 68, 0.1);
-    }
+    .btn-logout:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 
     /* SEKMELER */
     .tabs {
-      display: flex;
-      background: var(--surface-solid);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      padding: 0 12px;
+      display: flex; background: var(--surface-solid); border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 12px;
     }
     .tab-btn {
-      flex: 1; padding: 16px;
-      background: transparent; border: none;
-      color: var(--text-dim);
-      font-family: var(--font-main);
-      font-size: 0.95rem; font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all .2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      position: relative;
+      flex: 1; padding: 16px; background: transparent; border: none; color: var(--text-dim);
+      font-family: var(--font-main); font-size: 0.95rem; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px; position: relative;
     }
     .tab-btn:hover { color: var(--text); }
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-      font-weight: 600;
-    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
     .tab-btn .tab-icon { font-size: 1.2rem; }
 
     /* İÇERİK ALANLARI */
@@ -235,140 +171,73 @@
 
     /* MESAJ LISTESI */
     .messages-list {
-      flex: 1; overflow-y: auto;
-      padding: 24px;
-      display: flex; flex-direction: column; gap: 16px;
-      scroll-behavior: smooth;
+      flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
     }
     .messages-list::-webkit-scrollbar { width: 6px; }
     .messages-list::-webkit-scrollbar-track { background: transparent; }
     .messages-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-    .message-item {
-      display: flex; gap: 12px; align-items: flex-end;
-      animation: fadeSlideIn .3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
+    .message-item { display: flex; gap: 12px; align-items: flex-end; animation: fadeSlideIn .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .message-item.own { flex-direction: row-reverse; }
     @keyframes fadeSlideIn {
       from { opacity: 0; transform: translateY(15px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .msg-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 700; color: var(--text-dim);
-      flex-shrink: 0; font-family: var(--font-brand);
-      border: 1px solid var(--border);
+      width: 32px; height: 32px; border-radius: 50%; background: var(--surface2);
+      display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--text-dim);
+      flex-shrink: 0; font-family: var(--font-brand); border: 1px solid var(--border);
     }
-    .message-item.own .msg-avatar { display: none; } /* Kendi mesajımızda avatarı gizle, daha temiz görünür */
-    
+    .message-item.own .msg-avatar { display: none; }
     .msg-bubble {
-      max-width: 75%;
-      background: var(--surface-solid);
-      border: 1px solid var(--border);
-      border-radius: 20px 20px 20px 4px;
-      padding: 12px 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 75%; background: var(--surface-solid); border: 1px solid var(--border);
+      border-radius: 20px 20px 20px 4px; padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .message-item.own .msg-bubble {
-      background: linear-gradient(135deg, var(--accent), #4f46e5);
-      border-color: transparent;
-      border-radius: 20px 20px 4px 20px;
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+      background: linear-gradient(135deg, var(--accent), #4f46e5); border-color: transparent;
+      border-radius: 20px 20px 4px 20px; color: #fff; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
     }
-    .msg-nick {
-      font-size: .75rem; font-weight: 600; color: var(--accent2);
-      margin-bottom: 6px; font-family: var(--font-mono);
-    }
-    .message-item.own .msg-nick { display: none; } /* Kendi baloncuklarımızda ismimizi yazmaya gerek yok */
+    .msg-nick { font-size: .75rem; font-weight: 600; color: var(--accent2); margin-bottom: 6px; font-family: var(--font-mono); }
+    .message-item.own .msg-nick { display: none; }
     .msg-text { font-size: 0.95rem; line-height: 1.5; word-break: break-word; }
-    .msg-time {
-      font-size: .7rem; color: var(--text-dim);
-      margin-top: 6px; font-family: var(--font-mono);
-      text-align: left;
-    }
+    .msg-time { font-size: .7rem; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono); text-align: left; }
     .message-item.own .msg-time { color: rgba(255,255,255,0.7); text-align: right; }
 
     /* MESAJ INPUT */
     .message-input-area {
-      padding: 16px 24px;
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      display: flex; gap: 12px; align-items: flex-end;
-      flex-shrink: 0;
-      padding-bottom: env(safe-area-inset-bottom, 16px); /* iOS uyumluluğu */
+      padding: 16px 24px; background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end; flex-shrink: 0;
+      padding-bottom: env(safe-area-inset-bottom, 16px);
     }
     .message-input-area textarea {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      color: var(--text);
-      font-family: var(--font-main);
-      font-size: 1rem;
-      padding: 14px 20px;
-      outline: none;
-      resize: none;
-      max-height: 120px;
-      min-height: 52px;
-      transition: all .2s;
-      line-height: 1.4;
+      flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 24px; color: var(--text);
+      font-family: var(--font-main); font-size: 1rem; padding: 14px 20px; outline: none; resize: none;
+      max-height: 120px; min-height: 52px; transition: all .2s; line-height: 1.4;
     }
-    .message-input-area textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
+    .message-input-area textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
     .btn-send {
-      width: 52px; height: 52px; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 50%;
-      color: #fff; font-size: 1.2rem;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all .2s;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      width: 52px; height: 52px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 50%; color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all .2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
     .btn-send:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
     .btn-send:active { transform: scale(.94); }
 
-    /* POSTS (PAYLAŞIMLAR) */
-    .posts-list {
-      flex: 1; overflow-y: auto;
-      padding: 24px;
-      display: flex; flex-direction: column; gap: 20px;
-      scroll-behavior: smooth;
-    }
+    /* POSTS */
+    .posts-list { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
     .posts-list::-webkit-scrollbar { width: 6px; }
     .posts-list::-webkit-scrollbar-track { background: transparent; }
     .posts-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
     .post-card {
-      background: var(--surface-solid);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      animation: fadeSlideIn .3s ease;
-      transition: all .2s ease;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px; padding: 24px;
+      animation: fadeSlideIn .3s ease; transition: all .2s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
-    .post-card:hover { 
-      border-color: var(--accent); 
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    }
-    .post-header {
-      display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
-    }
+    .post-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .post-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
     .post-avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0;
-      font-family: var(--font-brand);
+      width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0; font-family: var(--font-brand);
     }
     .post-meta { flex: 1; }
     .post-nick { font-size: 1rem; font-weight: 600; color: var(--text); }
@@ -377,82 +246,42 @@
 
     /* POST INPUT */
     .post-input-area {
-      padding: 20px 24px;
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      display: flex; flex-direction: column; gap: 12px;
-      flex-shrink: 0;
+      padding: 20px 24px; background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;
       padding-bottom: env(safe-area-inset-bottom, 20px);
     }
     .post-input-area textarea {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--font-main);
-      font-size: 1rem;
-      padding: 16px;
-      outline: none;
-      resize: none;
-      min-height: 80px; max-height: 160px;
-      transition: all .2s;
-      line-height: 1.5;
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text);
+      font-family: var(--font-main); font-size: 1rem; padding: 16px; outline: none; resize: none; min-height: 80px; max-height: 160px; transition: all .2s; line-height: 1.5;
     }
-    .post-input-area textarea:focus { 
-      border-color: var(--accent2);
-      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-    }
-    .post-input-footer {
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .post-input-area textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1); }
+    .post-input-footer { display: flex; justify-content: space-between; align-items: center; }
     .char-count { font-size: .8rem; color: var(--text-dim); font-family: var(--font-mono); }
     .btn-post {
-      background: linear-gradient(135deg, var(--accent2), #d946ef);
-      border: none; border-radius: 999px;
-      color: #fff;
-      font-family: var(--font-main);
-      font-size: 0.95rem; font-weight: 600;
-      padding: 12px 28px;
-      cursor: pointer;
-      transition: all .2s;
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+      background: linear-gradient(135deg, var(--accent2), #d946ef); border: none; border-radius: 999px; color: #fff;
+      font-family: var(--font-main); font-size: 0.95rem; font-weight: 600; padding: 12px 28px; cursor: pointer; transition: all .2s; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
     }
     .btn-post:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4); }
     .btn-post:active { transform: scale(.97); }
 
     /* BOŞ DURUM */
-    .empty-state {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 16px;
-      color: var(--text-dim); text-align: center; padding: 40px;
-    }
+    .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-dim); text-align: center; padding: 40px; }
     .empty-state .empty-icon { font-size: 3.5rem; opacity: .5; margin-bottom: 10px; }
     .empty-state p { font-size: 1rem; font-weight: 500; }
 
     /* TOAST */
     #toast {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-      background: var(--surface-solid); border: 1px solid var(--border);
-      border-radius: 999px; padding: 12px 24px;
-      font-size: .9rem; font-weight: 500; color: var(--text);
-      box-shadow: 0 8px 32px rgba(0,0,0,.6);
-      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-      z-index: 9999; pointer-events: none;
-      display: flex; align-items: center; gap: 10px;
+      background: var(--surface-solid); border: 1px solid var(--border); border-radius: 999px; padding: 12px 24px;
+      font-size: .9rem; font-weight: 500; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.6);
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1); z-index: 9999; pointer-events: none; display: flex; align-items: center; gap: 10px;
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
     /* YENİ MESAJ BADGE */
     .new-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: #ef4444; color: #fff;
-      font-size: .7rem; font-weight: 700;
-      border-radius: 999px; padding: 2px 8px;
-      min-width: 20px; height: 20px;
-      margin-left: 6px;
-      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+      display: inline-flex; align-items: center; justify-content: center; background: #ef4444; color: #fff; font-size: .7rem; font-weight: 700;
+      border-radius: 999px; padding: 2px 8px; min-width: 20px; height: 20px; margin-left: 6px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
     }
 
     @media (max-width: 600px) {
@@ -471,7 +300,8 @@
 
 <!-- YÜKLEME EKRANI -->
 <div id="loading-screen">
-  <div class="logo-big">✦ İlim İrfan Grubu</div>
+  <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-big" />
+  <div class="logo-big">İlim İrfan</div>
   <div class="spinner"></div>
 </div>
 
@@ -479,23 +309,30 @@
 <div id="login-screen">
   <div class="login-card">
     <div class="login-header">
-      <div class="logo">✦ İlim İrfan</div>
+      <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-md" />
+      <div class="logo">İlim İrfan</div>
       <p>Aramıza katıl, bilgiyi paylaş.</p>
     </div>
     <div class="input-group">
       <label>Takma Ad (Nick)</label>
       <input type="text" id="nick-input" placeholder="örn. bilge_kisi" maxlength="24" autocomplete="off" />
     </div>
-    <button class="btn-primary" id="login-btn">Giriş Yap →</button>
+    <div class="input-group">
+      <label>Parola</label>
+      <input type="password" id="password-input" placeholder="Parolanız" maxlength="50" />
+    </div>
+    <button class="btn-primary" id="login-btn">Giriş Yap / Kayıt Ol →</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
 
 <!-- ANA UYGULAMA -->
 <div id="app">
-  <!-- Header -->
   <header class="app-header">
-    <div class="logo">✦ <span>İlim İrfan</span></div>
+    <div class="logo">
+      <img src="logo.png" alt="İlim İrfan Logo" class="logo-img-sm" />
+      <span>İlim İrfan</span>
+    </div>
     <div class="header-right">
       <div class="user-badge">
         <div class="user-avatar" id="header-avatar"></div>
@@ -505,7 +342,6 @@
     </div>
   </header>
 
-  <!-- Sekmeler -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="messages">
       <span class="tab-icon">💬</span> Sohbet
@@ -517,28 +353,16 @@
     </button>
   </div>
 
-  <!-- Mesajlar Sekmesi -->
   <div class="tab-content active" id="tab-messages">
-    <div class="messages-list" id="messages-list">
-      <div class="empty-state">
-        <div class="empty-icon">💬</div>
-        <p>Sessizlik hakim... İlk kelamı sen et!</p>
-      </div>
-    </div>
+    <div class="messages-list" id="messages-list"></div>
     <div class="message-input-area">
       <textarea id="msg-input" placeholder="Bir şeyler yaz... (Enter ile gönder)" rows="1"></textarea>
       <button class="btn-send" id="msg-send-btn">➤</button>
     </div>
   </div>
 
-  <!-- Paylaşımlar Sekmesi -->
   <div class="tab-content" id="tab-posts">
-    <div class="posts-list" id="posts-list">
-      <div class="empty-state">
-        <div class="empty-icon">📜</div>
-        <p>Henüz bir kelam paylaşılmamış. İlmini bizimle paylaş!</p>
-      </div>
-    </div>
+    <div class="posts-list" id="posts-list"></div>
     <div class="post-input-area">
       <textarea id="post-input" placeholder="Hangi derin düşüncelerdesin? Yaz, okuyalım..." rows="3" maxlength="1000"></textarea>
       <div class="post-input-footer">
@@ -549,7 +373,6 @@
   </div>
 </div>
 
-<!-- Toast bildirimi -->
 <div id="toast"></div>
 
 <script>
@@ -563,58 +386,49 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ---- State ----
   let currentNick = localStorage.getItem('ilimirfan_nick') || null;
   let activeTab   = 'messages';
-  let unreadMsgs  = 0;
-  let unreadPosts = 0;
-  let isFirstLoadMsg  = true;
-  let isFirstLoadPost = true;
+  let unreadMsgs  = 0, unreadPosts = 0;
+  let isFirstLoadMsg  = true, isFirstLoadPost = true;
 
-  // ---- Yardımcı: XSS kaçışı ----
+  // XSS Koruması
   function escape(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  // ---- Yardımcı: Zaman formatı ----
+  // Zaman Formatı
   function fmtTime(iso) {
-    const d = new Date(iso);
-    const now = new Date();
-    const sameDay = d.toDateString() === now.toDateString();
-    const h = d.getHours().toString().padStart(2,'0');
-    const m = d.getMinutes().toString().padStart(2,'0');
-    if (sameDay) return `${h}:${m}`;
+    const d = new Date(iso), now = new Date();
+    const h = d.getHours().toString().padStart(2,'0'), m = d.getMinutes().toString().padStart(2,'0');
+    if (d.toDateString() === now.toDateString()) return `${h}:${m}`;
     return `${d.getDate()}/${d.getMonth()+1} ${h}:${m}`;
   }
 
-  // ---- Yardımcı: Avatar baş harfi ----
-  function initials(nick) {
-    return escape(nick.slice(0,2).toUpperCase());
-  }
+  function initials(nick) { return escape(nick.slice(0,2).toUpperCase()); }
 
-  // ---- Toast ----
   function showToast(msg, duration = 3000) {
     const t = document.getElementById('toast');
-    t.innerHTML = msg; // HTML kullanıma izin ver (ikonlar için)
-    t.classList.add('show');
+    t.innerHTML = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), duration);
   }
 
-  // ---- Yükleme ekranını gizle ----
   function hideLoading() {
     const s = document.getElementById('loading-screen');
-    s.style.opacity = '0';
-    setTimeout(() => s.style.display = 'none', 500);
+    s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 500);
   }
 
-  // ---- GİRİŞ ----
+  // Güvenlik için parolayı Hashleme (Şifreleme) Fonksiyonu
+  async function hashPassword(password) {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // GİRİŞ VE KAYIT İŞLEMİ
   async function login() {
     const nick = document.getElementById('nick-input').value.trim();
+    const pass = document.getElementById('password-input').value.trim();
     const errEl = document.getElementById('login-error');
     errEl.textContent = '';
 
@@ -623,268 +437,183 @@
     if (!/^[a-zA-ZğüşöçıĞÜŞÖÇİ0-9_. -]+$/.test(nick)) {
       errEl.textContent = 'Nick yalnızca harf, rakam, _, . ve - içerebilir.'; return;
     }
+    if (!pass) { errEl.textContent = 'Parola boş olamaz.'; return; }
+    if (pass.length < 4) { errEl.textContent = 'Parola en az 4 karakter olmalı.'; return; }
 
     const btn = document.getElementById('login-btn');
     btn.textContent = 'Bağlanıyor...';
     btn.disabled = true;
 
-    // Kullanıcıyı kaydet ya da var olanı getir
-    const { error } = await db.from('users').upsert({ nick }, { onConflict: 'nick', ignoreDuplicates: true });
+    try {
+      const hashedPass = await hashPassword(pass);
 
-    btn.textContent = 'Giriş Yap →';
-    btn.disabled = false;
+      // 1. Kullanıcıyı veritabanında ara
+      const { data: users, error: fetchError } = await db
+        .from('users')
+        .select('password')
+        .eq('nick', nick);
 
-    if (error) {
-      errEl.textContent = 'Bir hata oluştu: ' + error.message; return;
+      if (fetchError) throw fetchError;
+
+      if (users && users.length > 0) {
+        // Kullanıcı var, parolayı kontrol et
+        if (users[0].password !== hashedPass) {
+          errEl.textContent = 'Hatalı parola! Lütfen tekrar deneyin.';
+          btn.textContent = 'Giriş Yap / Kayıt Ol →';
+          btn.disabled = false;
+          return;
+        }
+      } else {
+        // Kullanıcı yok, yeni kayıt oluştur
+        const { error: insertError } = await db
+          .from('users')
+          .insert([{ nick: nick, password: hashedPass }]);
+        
+        if (insertError) throw insertError;
+        showToast('✨ Hesabın başarıyla oluşturuldu!');
+      }
+
+      // Her şey başarılı
+      currentNick = nick;
+      localStorage.setItem('ilimirfan_nick', nick);
+      document.getElementById('password-input').value = ''; // Parolayı temizle
+      showApp();
+
+    } catch (err) {
+      errEl.textContent = 'Sunucu hatası: ' + err.message;
+    } finally {
+      btn.textContent = 'Giriş Yap / Kayıt Ol →';
+      btn.disabled = false;
     }
-
-    currentNick = nick;
-    localStorage.setItem('ilimirfan_nick', nick);
-    showApp();
   }
 
-  // ---- ÇIKIŞ ----
   function logout() {
     currentNick = null;
     localStorage.removeItem('ilimirfan_nick');
     document.getElementById('app').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('nick-input').value = '';
-    isFirstLoadMsg = true;
-    isFirstLoadPost = true;
-    unreadMsgs = 0; unreadPosts = 0;
-    updateBadges();
+    document.getElementById('password-input').value = '';
+    isFirstLoadMsg = true; isFirstLoadPost = true;
+    unreadMsgs = 0; unreadPosts = 0; updateBadges();
   }
 
-  // ---- UYGULAMAYI GÖSTER ----
   function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-
     document.getElementById('header-nick').textContent = currentNick;
     document.getElementById('header-avatar').innerHTML = initials(currentNick);
-
-    loadMessages();
-    loadPosts();
-    subscribeRealtime();
+    loadMessages(); loadPosts(); subscribeRealtime();
   }
 
-  // ---- SEKME DEĞİŞTİRME ----
+  // SEKMELER
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      activeTab = tab;
+      const tab = btn.dataset.tab; activeTab = tab;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + tab).classList.add('active');
-
+      btn.classList.add('active'); document.getElementById('tab-' + tab).classList.add('active');
       if (tab === 'messages') { unreadMsgs = 0; updateBadges(); scrollToBottom('messages-list'); }
       if (tab === 'posts')    { unreadPosts = 0; updateBadges(); }
     });
   });
 
   function updateBadges() {
-    const mb = document.getElementById('msg-badge');
-    const pb = document.getElementById('post-badge');
-    if (unreadMsgs > 0) { mb.style.display = ''; mb.textContent = unreadMsgs > 99 ? '99+' : unreadMsgs; }
-    else mb.style.display = 'none';
-    if (unreadPosts > 0) { pb.style.display = ''; pb.textContent = unreadPosts > 99 ? '99+' : unreadPosts; }
-    else pb.style.display = 'none';
+    const mb = document.getElementById('msg-badge'), pb = document.getElementById('post-badge');
+    if (unreadMsgs > 0) { mb.style.display = ''; mb.textContent = unreadMsgs > 99 ? '99+' : unreadMsgs; } else mb.style.display = 'none';
+    if (unreadPosts > 0) { pb.style.display = ''; pb.textContent = unreadPosts > 99 ? '99+' : unreadPosts; } else pb.style.display = 'none';
   }
 
-  // ============================================================
-  //  MESAJLAR
-  // ============================================================
+  // MESAJLAR
   async function loadMessages() {
-    const { data, error } = await db
-      .from('messages')
-      .select('*')
-      .order('created_at', { ascending: true })
-      .limit(200);
-
-    if (error) { console.error(error); return; }
-    const list = document.getElementById('messages-list');
-    list.innerHTML = '';
-    if (!data.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sessizlik hakim... İlk kelamı sen et!</p></div>`;
-      return;
-    }
+    const { data, error } = await db.from('messages').select('*').order('created_at', { ascending: true }).limit(200);
+    if (error) return;
+    const list = document.getElementById('messages-list'); list.innerHTML = '';
+    if (!data.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>Sessizlik hakim... İlk kelamı sen et!</p></div>`; return; }
     data.forEach(m => appendMessage(m, false));
-    setTimeout(() => scrollToBottom('messages-list'), 100);
-    isFirstLoadMsg = false;
+    setTimeout(() => scrollToBottom('messages-list'), 100); isFirstLoadMsg = false;
   }
 
   function appendMessage(m, animate = true) {
     const list = document.getElementById('messages-list');
-    // Boş durum varsa temizle
     if (list.querySelector('.empty-state')) list.innerHTML = '';
     const own = m.nick === currentNick;
-    const div = document.createElement('div');
-    div.className = 'message-item' + (own ? ' own' : '');
-    div.innerHTML = `
-      <div class="msg-avatar">${initials(m.nick)}</div>
-      <div class="msg-bubble">
-        <div class="msg-nick">${escape(m.nick)}</div>
-        <div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div>
-        <div class="msg-time">${fmtTime(m.created_at)}</div>
-      </div>`;
+    const div = document.createElement('div'); div.className = 'message-item' + (own ? ' own' : '');
+    div.innerHTML = `<div class="msg-avatar">${initials(m.nick)}</div><div class="msg-bubble"><div class="msg-nick">${escape(m.nick)}</div><div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div><div class="msg-time">${fmtTime(m.created_at)}</div></div>`;
     list.appendChild(div);
-
-    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 150;
-    if (atBottom || own || isFirstLoadMsg) scrollToBottom('messages-list');
+    if (list.scrollHeight - list.scrollTop - list.clientHeight < 150 || own || isFirstLoadMsg) scrollToBottom('messages-list');
   }
 
   async function sendMessage() {
-    const inp = document.getElementById('msg-input');
-    const content = inp.value.trim();
-    if (!content) return;
-    inp.value = '';
-    inp.style.height = '';
-
+    const inp = document.getElementById('msg-input'); const content = inp.value.trim();
+    if (!content) return; inp.value = ''; inp.style.height = '';
     const { error } = await db.from('messages').insert({ nick: currentNick, content });
-    if (error) { showToast('⚠️ Gönderilemedi: ' + error.message); }
+    if (error) showToast('⚠️ Gönderilemedi: ' + error.message);
   }
 
-  // ============================================================
-  //  PAYLAŞIMLAR
-  // ============================================================
+  // PAYLAŞIMLAR
   async function loadPosts() {
-    const { data, error } = await db
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-
-    if (error) { console.error(error); return; }
-    const list = document.getElementById('posts-list');
-    list.innerHTML = '';
-    if (!data.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><p>Henüz bir kelam paylaşılmamış. İlmini bizimle paylaş!</p></div>`;
-      return;
-    }
-    data.forEach(p => appendPost(p, false));
-    isFirstLoadPost = false;
+    const { data, error } = await db.from('posts').select('*').order('created_at', { ascending: false }).limit(100);
+    if (error) return;
+    const list = document.getElementById('posts-list'); list.innerHTML = '';
+    if (!data.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div><p>Henüz bir kelam paylaşılmamış. İlmini bizimle paylaş!</p></div>`; return; }
+    data.forEach(p => appendPost(p, false)); isFirstLoadPost = false;
   }
 
   function appendPost(p, prepend = true) {
     const list = document.getElementById('posts-list');
     if (list.querySelector('.empty-state')) list.innerHTML = '';
-    const div = document.createElement('div');
-    div.className = 'post-card';
-    div.innerHTML = `
-      <div class="post-header">
-        <div class="post-avatar">${initials(p.nick)}</div>
-        <div class="post-meta">
-          <div class="post-nick">${escape(p.nick)}</div>
-          <div class="post-time">${fmtTime(p.created_at)}</div>
-        </div>
-      </div>
-      <div class="post-content">${escape(p.content)}</div>`;
-    if (prepend) list.prepend(div);
-    else list.appendChild(div);
+    const div = document.createElement('div'); div.className = 'post-card';
+    div.innerHTML = `<div class="post-header"><div class="post-avatar">${initials(p.nick)}</div><div class="post-meta"><div class="post-nick">${escape(p.nick)}</div><div class="post-time">${fmtTime(p.created_at)}</div></div></div><div class="post-content">${escape(p.content)}</div>`;
+    prepend ? list.prepend(div) : list.appendChild(div);
   }
 
   async function sendPost() {
-    const inp = document.getElementById('post-input');
-    const content = inp.value.trim();
+    const inp = document.getElementById('post-input'); const content = inp.value.trim();
     if (!content) return;
-    
-    const btn = document.getElementById('post-send-btn');
-    btn.disabled = true;
-    btn.style.opacity = "0.7";
-
+    const btn = document.getElementById('post-send-btn'); btn.disabled = true; btn.style.opacity = "0.7";
     const { error } = await db.from('posts').insert({ nick: currentNick, content });
-    
-    btn.disabled = false;
-    btn.style.opacity = "1";
-
-    if (error) { showToast('⚠️ Gönderilemedi: ' + error.message); }
-    else { 
-      showToast('✨ İrfan panosuna eklendi!');
-      inp.value = '';
-      document.getElementById('char-count').textContent = '0';
-    }
+    btn.disabled = false; btn.style.opacity = "1";
+    if (error) showToast('⚠️ Gönderilemedi: ' + error.message);
+    else { showToast('✨ İrfan panosuna eklendi!'); inp.value = ''; document.getElementById('char-count').textContent = '0'; }
   }
 
-  // ============================================================
-  //  REALTIME
-  // ============================================================
+  // REALTIME
   function subscribeRealtime() {
-    db.channel('public-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        if (isFirstLoadMsg) return;
-        appendMessage(payload.new, true);
-        if (activeTab !== 'messages' && payload.new.nick !== currentNick) {
-          unreadMsgs++;
-          updateBadges();
-          showToast(`💬 <b>${escape(payload.new.nick)}</b>: ${escape(payload.new.content.slice(0,30))}${payload.new.content.length > 30 ? '...' : ''}`);
-        }
-      })
-      .subscribe();
+    db.channel('public-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      if (isFirstLoadMsg) return; appendMessage(payload.new, true);
+      if (activeTab !== 'messages' && payload.new.nick !== currentNick) {
+        unreadMsgs++; updateBadges(); showToast(`💬 <b>${escape(payload.new.nick)}</b>: ${escape(payload.new.content.slice(0,30))}${payload.new.content.length > 30 ? '...' : ''}`);
+      }
+    }).subscribe();
 
-    db.channel('public-posts')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-        if (isFirstLoadPost) return;
-        appendPost(payload.new, true);
-        if (activeTab !== 'posts' && payload.new.nick !== currentNick) {
-          unreadPosts++;
-          updateBadges();
-          showToast(`📜 <b>${escape(payload.new.nick)}</b> panoya yeni bir yazı astı!`);
-        }
-      })
-      .subscribe();
+    db.channel('public-posts').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+      if (isFirstLoadPost) return; appendPost(payload.new, true);
+      if (activeTab !== 'posts' && payload.new.nick !== currentNick) {
+        unreadPosts++; updateBadges(); showToast(`📜 <b>${escape(payload.new.nick)}</b> panoya yeni bir yazı astı!`);
+      }
+    }).subscribe();
   }
 
-  // ============================================================
-  //  YARDIMCILAR
-  // ============================================================
-  function scrollToBottom(id) {
-    const el = document.getElementById(id);
-    if(el) el.scrollTop = el.scrollHeight;
-  }
+  function scrollToBottom(id) { const el = document.getElementById(id); if(el) el.scrollTop = el.scrollHeight; }
+  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 
-  // Textarea otomatik büyüme
-  function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
-
-  // ============================================================
-  //  EVENT LİSTENERS
-  // ============================================================
+  // EVENT LİSTENERS
   document.getElementById('login-btn').addEventListener('click', login);
-  document.getElementById('nick-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') login();
-  });
+  document.getElementById('nick-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password-input').focus(); });
+  document.getElementById('password-input').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 
   document.getElementById('logout-btn').addEventListener('click', logout);
   document.getElementById('msg-send-btn').addEventListener('click', sendMessage);
-
-  document.getElementById('msg-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { 
-      e.preventDefault(); 
-      sendMessage(); 
-    }
-  });
+  document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
   document.getElementById('msg-input').addEventListener('input', function() { autoResize(this); });
-
   document.getElementById('post-send-btn').addEventListener('click', sendPost);
-  document.getElementById('post-input').addEventListener('input', function() {
-    document.getElementById('char-count').textContent = this.value.length;
-  });
+  document.getElementById('post-input').addEventListener('input', function() { document.getElementById('char-count').textContent = this.value.length; });
 
-  // ============================================================
-  //  BAŞLATMA
-  // ============================================================
   (async function init() {
-    setTimeout(hideLoading, 500); // Ekstra smooth hissetmesi için küçük bir gecikme
-    if (currentNick) {
-      document.getElementById('login-screen').style.display = 'none';
-      showApp();
-    } else {
-      document.getElementById('login-screen').style.display = 'flex';
-    }
+    setTimeout(hideLoading, 500);
+    if (currentNick) { document.getElementById('login-screen').style.display = 'none'; showApp(); } 
+    else { document.getElementById('login-screen').style.display = 'flex'; }
   })();
 </script>
 </body>

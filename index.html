@@ -160,7 +160,9 @@
     .dm-header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .btn-back { background: none; border: none; color: var(--text-dim); font-size: 1rem; display: flex; align-items: center; gap: 4px; cursor: pointer;}
     
+    /* Çevrimiçi/Çevrimdışı Noktaları */
     .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); display: inline-block; }
+    .offline-dot { width: 10px; height: 10px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); display: inline-block; }
     .dm-header-title { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-weight: 600; font-size: 1.1rem; margin-right: 40px; }
     
     .post-card { background: var(--surface2); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
@@ -209,7 +211,7 @@
   </p>
   
   <ul class="guide-list">
-    <li><strong>🟢 Çevrimiçi & Yazıyor...</strong> Kişiler listesindeki yeşil nokta o an aktif olanları gösterir. Birisi sana mesaj yazarken anında bildirimini görebilirsin.</li>
+    <li><strong>🟢/🔴 Çevrimiçi Durumu & Yazıyor...</strong> Kişiler listesinde yeşil nokta (🟢) o an aktif olanları, kırmızı nokta (🔴) ise çevrimdışı olanları gösterir. Biri sana mesaj yazarken anında bildirimini görebilirsin.</li>
     <li><strong>↩️ Kaydırarak Yanıtla</strong> Bir mesaja hızlıca yanıt vermek (alıntılamak) için baloncuğun üzerine dokun veya mesajı sağa doğru <b>kaydır (swipe)</b>.</li>
     <li><strong>🗑️ Mesaj Silme</strong> Gönderdiğin bir mesaja dokunup <b>Sil</b> diyerek kelamını herkesin ekranından anında silebilirsin.</li>
     <li><strong>😜 Sticker & Meme Sesleri</strong> Mesaj kutusundaki emoji butonuna basarak gruba özel sticker ve komik sesler atabilir, <b>+ Yeni Ekle</b> ile listeyi genişletebilirsin.</li>
@@ -278,7 +280,7 @@
         <button class="btn-back" id="dm-back-btn">← Geri</button>
         <div class="dm-header-title">
           <span id="dm-chat-title">Nick</span>
-          <span id="dm-chat-online-dot" class="online-dot" style="display:none;"></span>
+          <span id="dm-chat-status-dot" class="offline-dot"></span>
         </div>
       </div>
       <div class="scroll-area" id="dm-messages-list"></div>
@@ -530,7 +532,14 @@
   }
 
   function closeActionMenus() { document.querySelectorAll('.msg-action-menu').forEach(m => m.remove()); }
-  function setQuote(nick, content, context) { quoteState[context] = { nick, content }; document.getElementById(`${context}-quote-preview`).style.display = 'flex'; document.getElementById(`${context}-quote-nick`).textContent = nick; document.getElementById(`${context}-quote-text`).textContent = content; document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus(); }
+
+  function setQuote(nick, content, context) {
+    quoteState[context] = { nick, content };
+    document.getElementById(`${context}-quote-preview`).style.display = 'flex';
+    document.getElementById(`${context}-quote-nick`).textContent = nick;
+    document.getElementById(`${context}-quote-text`).textContent = content;
+    document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus();
+  }
   function cancelQuote(context) { quoteState[context]=null; document.getElementById(`${context}-quote-preview`).style.display='none'; }
 
   async function toggleRecording(context) {
@@ -553,8 +562,10 @@
     const q = quoteState[context];
     if(context==='global') await db.from('messages').insert({ nick: currentNick, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
     else await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
-    cancelQuote(context); sendTypingStatus(context, false);
+    cancelQuote(context);
+    sendTypingStatus(context, false); // Mesaj atınca yazıyor durumu anında bitsin
   }
+
   async function deleteMessage(messageId, listId) {
     const table = listId === 'messages-list' ? 'messages' : 'private_messages';
     const { error } = await db.from(table).delete().eq('id', messageId);
@@ -564,10 +575,19 @@
   document.getElementById('msg-send-btn').addEventListener('click', () => { const i=document.getElementById('msg-input'); if(i.value.trim()){ sendActualMessage('global', i.value.trim()); i.value=''; i.style.height='auto'; }});
   document.getElementById('dm-send-btn').addEventListener('click', () => { const i=document.getElementById('dm-input'); if(i.value.trim()){ sendActualMessage('dm', i.value.trim()); i.value=''; i.style.height='auto'; }});
   
+  // Inputlara "Yazıyor..." özelliği entegresi
   ['msg-input', 'dm-input'].forEach(id => {
-    const context = id === 'msg-input' ? 'global' : 'dm'; const el = document.getElementById(id);
-    el.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); } });
-    el.addEventListener('input', function() { autoResize(this); handleTypingInput(context); });
+    const context = id === 'msg-input' ? 'global' : 'dm';
+    const el = document.getElementById(id);
+    
+    el.addEventListener('keydown', e => { 
+      if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); }
+    });
+    
+    el.addEventListener('input', function() { 
+      autoResize(this); 
+      handleTypingInput(context); // Klavye her değiştiğinde yayını tetikle
+    });
   });
 
   // ===== ÇEKMECE =====
@@ -606,16 +626,33 @@
   function renderUserList() {
     const list=document.getElementById('dm-user-list'); list.innerHTML='';
     allUsersList.forEach(u => { 
-      const b = unreadDmMap[u.nick] || 0; const isOnline = onlineUsers.has(u.nick);
+      const b = unreadDmMap[u.nick] || 0; 
+      const isOnline = onlineUsers.has(u.nick); // KİŞİ ONLINE MI?
+      
       const d=document.createElement('div'); d.className='user-list-item'; 
-      d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1; display:flex; align-items:center; gap:8px;">${escape(u.nick)} ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : ''}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; 
-      d.onclick=()=>openDm(u.nick); list.appendChild(d); 
+      d.innerHTML=`
+        <div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div>
+        <strong style="flex:1; display:flex; align-items:center; gap:8px;">
+          ${escape(u.nick)} 
+          ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : '<span class="offline-dot" title="Çevrimdışı"></span>'}
+        </strong>
+        ${b>0?`<span class="badge" style="position:static">${b}</span>`:''}
+      `; 
+      d.onclick=()=>openDm(u.nick); 
+      list.appendChild(d); 
     });
   }
 
   async function openDm(nick) { 
-    activeDmUser=nick; document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; document.getElementById('dm-chat-title').textContent=nick; 
-    document.getElementById('dm-chat-online-dot').style.display = onlineUsers.has(nick) ? 'inline-block' : 'none';
+    activeDmUser=nick; 
+    document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; 
+    document.getElementById('dm-chat-title').textContent=nick; 
+    
+    // Sohbet açıldığında üstte online/offline dot göster
+    const dot = document.getElementById('dm-chat-status-dot');
+    dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot';
+    dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
+
     if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } 
     const list=document.getElementById('dm-messages-list'); list.innerHTML=''; 
     const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:true}).limit(100); 
@@ -626,25 +663,44 @@
   async function loadPosts() { const {data}=await db.from('posts').select('*').order('created_at',{ascending:false}).limit(50); const list=document.getElementById('posts-list'); list.innerHTML=''; if(data) data.forEach(p=>{ const d=document.createElement('div'); d.className='post-card'; d.innerHTML=`<div class="post-header"><div class="user-avatar">${p.nick.substring(0,2).toUpperCase()}</div><div><strong>${escape(p.nick)}</strong><div style="font-size:0.7rem;opacity:0.7">${fmtTime(p.created_at)}</div></div></div><div>${escape(p.content).replace(/\n/g, '<br>')}</div>`; list.appendChild(d); }); }
   document.getElementById('post-send-btn').onclick = async () => { const i=document.getElementById('post-input'); if(i.value.trim()){ await db.from('posts').insert({nick:currentNick, content:i.value.trim()}); i.value=''; i.style.height='auto'; showToast('Pano güncellendi'); } };
 
-  // ===== PRESENCE & REALTIME KANALI =====
+  // ===== PRESENCE, BROADCAST VE DB REALTIME KANALI =====
   function subscribeRealtime() {
     if (realtimeChannel) { realtimeChannel.unsubscribe(); }
-    realtimeChannel = db.channel('ilim-irfan-room', { config: { presence: { key: currentNick } } });
 
-    realtimeChannel.on('presence', { event: 'sync' }, () => {
-      const state = realtimeChannel.presenceState(); onlineUsers.clear();
-      for (const id in state) { onlineUsers.add(state[id][0].nick); }
-      if(activeTab === 'dm' && activeDmUser === null) renderUserList();
-      if(activeDmUser) document.getElementById('dm-chat-online-dot').style.display = onlineUsers.has(activeDmUser) ? 'inline-block' : 'none';
+    realtimeChannel = db.channel('ilim-irfan-room', {
+      config: { presence: { key: currentNick } }
     });
 
+    // 1. ONLINE (ÇEVRİMİÇİ) KİŞİLERİ TAKİP ET
+    realtimeChannel.on('presence', { event: 'sync' }, () => {
+      const state = realtimeChannel.presenceState();
+      onlineUsers.clear();
+      for (const id in state) { onlineUsers.add(state[id][0].nick); }
+      
+      // Arayüzü Güncelle
+      if(activeTab === 'dm' && activeDmUser === null) renderUserList();
+      if(activeDmUser) {
+        const dot = document.getElementById('dm-chat-status-dot');
+        dot.className = onlineUsers.has(activeDmUser) ? 'online-dot' : 'offline-dot';
+        dot.title = onlineUsers.has(activeDmUser) ? 'Çevrimiçi' : 'Çevrimdışı';
+      }
+    });
+
+    // 2. YAZIYOR (TYPING) BİLDİRİMLERİNİ YAKALA
     realtimeChannel.on('broadcast', { event: 'typing' }, payload => {
       const { nick, context, isTyping, receiver } = payload.payload;
-      if (nick === currentNick) return;
-      if (context === 'global') { if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick); updateTypingUI('global'); } 
-      else if (context === 'dm' && receiver === currentNick) { if (isTyping) typingUsers.dm.add(nick); else typingUsers.dm.delete(nick); updateTypingUI('dm'); }
+      if (nick === currentNick) return; // Kendi yazıyor durumumuzu yoksay
+
+      if (context === 'global') {
+        if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick);
+        updateTypingUI('global');
+      } else if (context === 'dm' && receiver === currentNick) {
+        if (isTyping) typingUsers.dm.add(nick); else typingUsers.dm.delete(nick);
+        updateTypingUI('dm');
+      }
     });
 
+    // 3. VERİTABANI DEĞİŞİKLİKLERİ (MESAJLAR, DM, SİLME)
     realtimeChannel
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, p=>{ appendHtmlMessage(p.new, 'messages-list'); if(activeTab!=='messages' && p.new.nick!==currentNick){ unreadMsgs++; updateBadges(); } })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
@@ -652,7 +708,12 @@
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'private_messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } });
 
-    realtimeChannel.subscribe(async (status) => { if (status === 'SUBSCRIBED') { await realtimeChannel.track({ nick: currentNick }); } });
+    // Kanala Bağlan ve Kendini Online Olarak İşaretle
+    realtimeChannel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await realtimeChannel.track({ nick: currentNick });
+      }
+    });
   }
 
   document.getElementById('login-btn').onclick = login;

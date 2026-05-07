@@ -486,29 +486,38 @@
   }
 
   // Medya Yükleme (Kullanıcı tarafından)
-  async function handleMediaUpload(e) {
+ async function handleMediaUpload(e) {
     const file = e.target.files[0]; if(!file) return;
     const isImage = file.type.startsWith('image/');
     const bucket = isImage ? 'stickers' : 'meme_sounds';
     const table = isImage ? 'stickers' : 'meme_sounds';
     
-    let name = "Sticker";
-    if (!isImage) {
-      name = prompt("Bu komik sesin adı ne olsun?");
-      if(!name) return showToast("İptal edildi.");
+    let name = null; 
+    if (!isImage) { 
+      name = prompt("Sesin adı ne olsun?"); 
+      if(!name) return; 
     }
-
-    showToast('Yükleniyor...');
-    const fileName = `${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
-    const {data, error} = await db.storage.from(bucket).upload(fileName, file);
     
-    if(error) return showToast('Yükleme hatası: ' + error.message);
+    showToast('Yükleniyor...');
+    
+    // 1. Storage'a (Depoya) yükle
+    const {data, error: uploadErr} = await db.storage.from(bucket).upload(`${Date.now()}_${file.name.replace(/\s+/g,'_')}`, file);
+    if(uploadErr) return showToast('Yükleme hatası: ' + uploadErr.message);
+    
     const url = db.storage.from(bucket).getPublicUrl(data.path).data.publicUrl;
-
-    await db.from(table).insert({ url: url, name: name, added_by: currentNick });
-    showToast('Başarıyla eklendi!');
-    loadMediaAssets(); // Listeyi yenile
-    e.target.value = ''; // Inputu sıfırla
+    
+    // 2. Veritabanına kaydet (Hata buradaydı, artık sticker ise isim göndermiyoruz)
+    const insertData = { url: url, added_by: currentNick };
+    if (!isImage) insertData.name = name; 
+    
+    const { error: dbError } = await db.from(table).insert(insertData);
+    
+    // Eğer veritabanı reddederse artık hatayı ekranda göreceğiz
+    if (dbError) return showToast('Veritabanı hatası: ' + dbError.message);
+    
+    showToast('Başarıyla eklendi!'); 
+    loadMediaAssets(); 
+    e.target.value='';
   }
 
   // ===== TEMEL SOHBET / PANO GETİRME =====

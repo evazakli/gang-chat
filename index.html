@@ -144,7 +144,7 @@
     .drawer-footer { padding: 12px 16px; border-top: 1px solid var(--border); padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     .btn-upload { background: var(--surface2); border: 1px dashed var(--accent); color: var(--accent); border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
 
-    /* ===== KULLANIM KILAVUZU & AYARLAR MODAL ORTAK ===== */
+    /* ===== MODALLAR (AYARLAR, KILAVUZ, ÇIKIŞ) ORTAK ===== */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; opacity: 0; transition: opacity .3s; backdrop-filter: blur(2px); }
     .modal-overlay.show { opacity: 1; }
     .custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95); width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px 24px 24px; z-index: 1001; display: none; opacity: 0; transition: all .3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
@@ -160,7 +160,6 @@
     .dm-header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .btn-back { background: none; border: none; color: var(--text-dim); font-size: 1rem; display: flex; align-items: center; gap: 4px; cursor: pointer;}
     
-    /* Çevrimiçi/Çevrimdışı Noktaları */
     .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); display: inline-block; }
     .offline-dot { width: 10px; height: 10px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); display: inline-block; }
     .dm-header-title { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-weight: 600; font-size: 1.1rem; margin-right: 40px; }
@@ -176,6 +175,19 @@
 <body>
 
 <div id="loading-screen"><div class="spinner"></div></div>
+
+<div class="modal-overlay" id="logout-overlay" onclick="closeLogoutModal()"></div>
+<div class="custom-modal" id="logout-modal">
+  <button class="quote-close" onclick="closeLogoutModal()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
+  <h2 style="color:var(--accent2); margin-bottom:12px; text-align:center; font-family:var(--font-brand);">Destursuz çıkılmaz!</h2>
+  <p style="font-size:0.95rem; line-height:1.5; color:var(--text); margin-bottom:20px; text-align:center;">
+    Bu ilim irfan meclisinden ayrılmak üzeresin.<br>Çıkmak için destur aldın mı?
+  </p>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <button class="btn-primary" onclick="closeLogoutModal()" style="background:var(--surface2); color:var(--text);">Destur Almadım</button>
+    <button class="btn-primary" onclick="executeLogout()" style="background:#ef4444; color:#fff;">Destur Aldım</button>
+  </div>
+</div>
 
 <div class="modal-overlay" id="settings-overlay" onclick="closeSettings()"></div>
 <div class="custom-modal" id="settings-modal">
@@ -217,6 +229,7 @@
     <li><strong>😜 Sticker & Meme Sesleri</strong> Mesaj kutusundaki emoji butonuna basarak gruba özel sticker ve komik sesler atabilir, <b>+ Yeni Ekle</b> ile listeyi genişletebilirsin.</li>
     <li><strong>🎙️ Sesli Mesaj</strong> Mikrofon ikonuna bir kez dokun kayda başla, bitince tekrar dokun ve gönder!</li>
     <li><strong>⚙️ Profil Ayarları</strong> Sağ üstteki ismine dokunarak şifreni veya nickini güncelleyebilirsin. Yeni ismin anında tüm sohbetlerine yansır.</li>
+    <li><strong>🚪 Destursuz Çıkılmaz!</strong> Sağ üstteki kapı ikonuna tıklayarak gruptan ayrılabilirsin. Ama unutma; bu meclisten destur almadan çıkılmaz!</li>
     <li><strong>🌓 Gece/Gündüz Modu</strong> Üstteki ☀️/🌙 butonuyla temayı göz zevkine göre ayarla.</li>
   </ul>
 
@@ -373,6 +386,29 @@
     localStorage.setItem('ilimirfan_theme', newTheme);
     document.getElementById('theme-btn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
+
+  // ===== ÇIKIŞ ONAYI (DESTUR) MODALI =====
+  function confirmLogout() {
+    document.getElementById('logout-overlay').style.display = 'block'; 
+    document.getElementById('logout-modal').style.display = 'block';
+    setTimeout(() => { 
+      document.getElementById('logout-overlay').classList.add('show'); 
+      document.getElementById('logout-modal').classList.add('show'); 
+    }, 10);
+  }
+  function closeLogoutModal() {
+    document.getElementById('logout-overlay').classList.remove('show'); 
+    document.getElementById('logout-modal').classList.remove('show');
+    setTimeout(() => { 
+      document.getElementById('logout-overlay').style.display = 'none'; 
+      document.getElementById('logout-modal').style.display = 'none'; 
+    }, 300);
+  }
+  function executeLogout() {
+    currentNick = null;
+    localStorage.clear();
+    location.reload();
+  }
 
   // ===== KILAVUZ & AYARLAR =====
   function openGuide() {
@@ -562,32 +598,36 @@
     const q = quoteState[context];
     if(context==='global') await db.from('messages').insert({ nick: currentNick, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
     else await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
-    cancelQuote(context);
-    sendTypingStatus(context, false); // Mesaj atınca yazıyor durumu anında bitsin
+    cancelQuote(context); sendTypingStatus(context, false);
   }
 
+  // ===== MESAJ SİLME =====
   async function deleteMessage(messageId, listId) {
+    // 1. Ekrandan anında gizle (UI Hilesi)
+    const el = document.querySelector(`.msg-item[data-id="${messageId}"]`);
+    if (el) el.style.display = 'none';
+
     const table = listId === 'messages-list' ? 'messages' : 'private_messages';
-    const { error } = await db.from(table).delete().eq('id', messageId);
-    if (error) showToast('Silinemedi: ' + error.message);
+    
+    // 2. Veritabanından sil ve dönen veriyi bekle
+    const { data, error } = await db.from(table).delete().eq('id', messageId).select();
+
+    // 3. RLS engellediyse mesajı geri getir ve hata ver
+    if (error || !data || data.length === 0) {
+      if (el) el.style.display = 'flex';
+      showToast('⚠️ Silinemedi. Sayfayı yenileyin.');
+    } else {
+      if (el) el.remove(); // DOM'dan kalıcı olarak temizle
+    }
   }
 
   document.getElementById('msg-send-btn').addEventListener('click', () => { const i=document.getElementById('msg-input'); if(i.value.trim()){ sendActualMessage('global', i.value.trim()); i.value=''; i.style.height='auto'; }});
   document.getElementById('dm-send-btn').addEventListener('click', () => { const i=document.getElementById('dm-input'); if(i.value.trim()){ sendActualMessage('dm', i.value.trim()); i.value=''; i.style.height='auto'; }});
   
-  // Inputlara "Yazıyor..." özelliği entegresi
   ['msg-input', 'dm-input'].forEach(id => {
-    const context = id === 'msg-input' ? 'global' : 'dm';
-    const el = document.getElementById(id);
-    
-    el.addEventListener('keydown', e => { 
-      if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); }
-    });
-    
-    el.addEventListener('input', function() { 
-      autoResize(this); 
-      handleTypingInput(context); // Klavye her değiştiğinde yayını tetikle
-    });
+    const context = id === 'msg-input' ? 'global' : 'dm'; const el = document.getElementById(id);
+    el.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); } });
+    el.addEventListener('input', function() { autoResize(this); handleTypingInput(context); });
   });
 
   // ===== ÇEKMECE =====
@@ -627,7 +667,7 @@
     const list=document.getElementById('dm-user-list'); list.innerHTML='';
     allUsersList.forEach(u => { 
       const b = unreadDmMap[u.nick] || 0; 
-      const isOnline = onlineUsers.has(u.nick); // KİŞİ ONLINE MI?
+      const isOnline = onlineUsers.has(u.nick);
       
       const d=document.createElement('div'); d.className='user-list-item'; 
       d.innerHTML=`
@@ -648,7 +688,6 @@
     document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; 
     document.getElementById('dm-chat-title').textContent=nick; 
     
-    // Sohbet açıldığında üstte online/offline dot göster
     const dot = document.getElementById('dm-chat-status-dot');
     dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot';
     dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
@@ -671,13 +710,11 @@
       config: { presence: { key: currentNick } }
     });
 
-    // 1. ONLINE (ÇEVRİMİÇİ) KİŞİLERİ TAKİP ET
     realtimeChannel.on('presence', { event: 'sync' }, () => {
       const state = realtimeChannel.presenceState();
       onlineUsers.clear();
       for (const id in state) { onlineUsers.add(state[id][0].nick); }
       
-      // Arayüzü Güncelle
       if(activeTab === 'dm' && activeDmUser === null) renderUserList();
       if(activeDmUser) {
         const dot = document.getElementById('dm-chat-status-dot');
@@ -686,10 +723,9 @@
       }
     });
 
-    // 2. YAZIYOR (TYPING) BİLDİRİMLERİNİ YAKALA
     realtimeChannel.on('broadcast', { event: 'typing' }, payload => {
       const { nick, context, isTyping, receiver } = payload.payload;
-      if (nick === currentNick) return; // Kendi yazıyor durumumuzu yoksay
+      if (nick === currentNick) return; 
 
       if (context === 'global') {
         if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick);
@@ -700,7 +736,6 @@
       }
     });
 
-    // 3. VERİTABANI DEĞİŞİKLİKLERİ (MESAJLAR, DM, SİLME)
     realtimeChannel
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, p=>{ appendHtmlMessage(p.new, 'messages-list'); if(activeTab!=='messages' && p.new.nick!==currentNick){ unreadMsgs++; updateBadges(); } })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
@@ -708,7 +743,6 @@
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'private_messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } });
 
-    // Kanala Bağlan ve Kendini Online Olarak İşaretle
     realtimeChannel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         await realtimeChannel.track({ nick: currentNick });
@@ -718,7 +752,7 @@
 
   document.getElementById('login-btn').onclick = login;
   document.getElementById('password-input').onkeydown = e => { if(e.key==='Enter') login(); };
-  document.getElementById('logout-btn').onclick = () => { localStorage.clear(); location.reload(); };
+  document.getElementById('logout-btn').onclick = confirmLogout; // Eski doğrudan çıkışı İptal Ettik, Destur Modalını Bağladık
 
   (async function init() { if(currentNick) showApp(); else { document.getElementById('login-screen').style.display='flex'; hideLoading(); } })();
 </script>

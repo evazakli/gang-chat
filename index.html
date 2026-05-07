@@ -11,7 +11,6 @@
     /* ========== TEMEL VE TEMA SIFIRLAMALARI ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
-    /* KARANLIK TEMA (Varsayılan) */
     :root {
       --bg: #09090b; --surface: #18181b; --surface-trans: rgba(24, 24, 27, 0.85); 
       --surface2: #27272a; --border: #3f3f46; --accent: #6366f1; --accent-hover: #4f46e5;
@@ -20,7 +19,6 @@
       --menu-bg: #f4f4f5; --menu-text: #09090b;
     }
 
-    /* AYDINLIK TEMA */
     :root[data-theme="light"] {
       --bg: #f4f4f5; --surface: #ffffff; --surface-trans: rgba(255, 255, 255, 0.85); 
       --surface2: #e4e4e7; --border: #d4d4d8; --accent: #4f46e5; --accent-hover: #4338ca;
@@ -49,13 +47,13 @@
     /* ===== HEADER ===== */
     #app { display: none; flex-direction: column; flex: 1; height: 100dvh; overflow: hidden; width: 100vw; }
     .app-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; padding-top: calc(12px + env(safe-area-inset-top)); background: var(--surface-trans); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; transition: background-color 0.3s; }
-    
     .header-logo { font-family: var(--font-brand); font-size: 1.3rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; cursor: pointer; transition: transform 0.2s; padding: 4px; border-radius: 12px;}
     .header-logo:active { transform: scale(0.95); background: rgba(128,128,128,0.1); }
     .header-logo img { height: 32px; width: 32px; object-fit: contain; pointer-events: none;}
-    
     .header-right { display: flex; align-items: center; gap: 10px; }
-    .user-badge { display: flex; align-items: center; gap: 8px; background: var(--surface2); border-radius: 20px; padding: 4px 12px 4px 4px; transition: background-color 0.3s; }
+    .user-badge { display: flex; align-items: center; gap: 8px; background: var(--surface2); border-radius: 20px; padding: 4px 12px 4px 4px; transition: background-color 0.3s, transform 0.2s; cursor: pointer; border: 1px solid transparent; }
+    .user-badge:hover { border-color: var(--accent); background: var(--surface); }
+    .user-badge:active { transform: scale(0.95); }
     .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: bold; color: #fff; }
     .user-nick { font-size: .85rem; font-weight: 500; }
     .btn-icon { background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; padding: 4px; transition: color 0.2s; }
@@ -73,24 +71,24 @@
     .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
     .tab-content.active { display: flex; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-    .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+    .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; position: relative;}
+
+    /* ===== YAZIYOR... (TYPING) BİLDİRİMİ ===== */
+    .typing-indicator { font-size: 0.75rem; color: var(--accent); font-weight: 600; font-family: var(--font-mono); padding: 4px 16px; height: 24px; display: flex; align-items: center; opacity: 0; transition: opacity 0.3s; }
+    .typing-indicator.show { opacity: 1; }
 
     /* ===== MESAJ TASARIMI ===== */
     .msg-item { display: flex; gap: 8px; align-items: flex-end; position: relative; animation: slideUp .2s ease-out; transition: transform 0.2s; }
     .msg-item.own { flex-direction: row-reverse; }
     @keyframes slideUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-    
     .msg-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: bold; color: var(--text-dim); flex-shrink: 0; }
     .msg-item.own .msg-avatar { display: none; }
-    
     .msg-bubble { max-width: 82%; background: var(--surface2); border-radius: 18px 18px 18px 4px; padding: 10px 14px; position: relative; box-shadow: 0 1px 4px rgba(0,0,0,0.05); cursor: pointer; transition: background-color 0.3s; }
     .msg-item.own .msg-bubble { background: var(--accent); color: #fff; border-radius: 18px 18px 4px 18px; }
     
-    /* Etkileşim Menüsü (Yanıtla / Sil) */
     .msg-action-menu { position: absolute; top: -55px; background: var(--menu-bg); color: var(--menu-text); padding: 6px; border-radius: 16px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 100; animation: popMenu .2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
     .msg-item:not(.own) .msg-action-menu { left: 0; top: -45px; } 
     .msg-item.own .msg-action-menu { right: 0; }
-    
     .menu-action { padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .menu-action:active { background: rgba(128,128,128,0.2); }
     .menu-danger { color: #ef4444; }
@@ -104,17 +102,15 @@
 
     .msg-bubble.is-sticker { background: transparent !important; box-shadow: none !important; padding: 0 !important; max-width: 140px; }
     .msg-sticker-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
-    
     .msg-nick { font-size: .75rem; font-weight: 600; color: var(--accent2); margin-bottom: 4px; }
     .msg-item.own .msg-nick { display: none; }
     .msg-text { font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
     .msg-time { font-size: .65rem; opacity: 0.7; margin-top: 4px; text-align: right; }
-    
     .btn-meme-play { background: rgba(128,128,128,0.15); border: none; color: inherit; padding: 10px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.95rem; font-family: var(--font-main); }
     .msg-item.own .btn-meme-play { background: rgba(255,255,255,0.2); color: #fff; }
 
     /* ===== GİRİŞ VE ALINTI ÇUBUĞU ===== */
-    .input-wrapper { display: flex; flex-direction: column; background: var(--bg); padding: 8px 12px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; position: relative; transition: background-color 0.3s; }
+    .input-wrapper { display: flex; flex-direction: column; background: var(--bg); padding: 0 12px 8px 12px; padding-bottom: env(safe-area-inset-bottom); flex-shrink: 0; position: relative; transition: background-color 0.3s; }
     .quote-preview { display: none; background: var(--surface2); border-left: 4px solid var(--accent); border-radius: 16px 16px 0 0; padding: 12px 14px 20px 14px; margin: 0 4px -14px 4px; justify-content: space-between; align-items: center; z-index: 1; transition: background-color 0.3s; }
     .quote-preview-content { display: flex; flex-direction: column; }
     .quote-preview-nick { font-weight: bold; color: var(--accent); font-size: 0.8rem; margin-bottom: 2px; }
@@ -145,24 +141,28 @@
     .meme-list { display: flex; flex-direction: column; gap: 8px; }
     .meme-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface2); border-radius: 12px; cursor: pointer; }
     .meme-item-icon { font-size: 1.5rem; }
-    
     .drawer-footer { padding: 12px 16px; border-top: 1px solid var(--border); padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     .btn-upload { background: var(--surface2); border: 1px dashed var(--accent); color: var(--accent); border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
 
-    /* ===== KULLANIM KILAVUZU (WELCOME MODAL) ===== */
-    .guide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; opacity: 0; transition: opacity .3s; backdrop-filter: blur(2px); }
-    .guide-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95); width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px 24px 24px; z-index: 1001; display: none; opacity: 0; transition: all .3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .guide-modal.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    .guide-overlay.show { opacity: 1; }
-    .guide-modal::-webkit-scrollbar { display: none; }
-    .guide-list { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; padding-left: 12px; display: flex; flex-direction: column; gap: 12px; list-style-type: none; margin-bottom: 24px; }
-    .guide-list li { position: relative; padding-left: 20px; }
-    .guide-list li::before { content: "✦"; position: absolute; left: 0; color: var(--accent); font-size: 0.8rem; top: 2px; }
+    /* ===== KULLANIM KILAVUZU & AYARLAR MODAL ORTAK ===== */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; opacity: 0; transition: opacity .3s; backdrop-filter: blur(2px); }
+    .modal-overlay.show { opacity: 1; }
+    .custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%) scale(0.95); width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px 24px 24px; z-index: 1001; display: none; opacity: 0; transition: all .3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .custom-modal.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .custom-modal::-webkit-scrollbar { display: none; }
+    
+    .guide-list { font-size: 0.85rem; color: var(--text); line-height: 1.6; display: flex; flex-direction: column; gap: 14px; list-style-type: none; margin-bottom: 24px; }
+    .guide-list li { background: var(--surface2); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+    .guide-list li strong { display: block; color: var(--accent); margin-bottom: 4px; font-size: 0.9rem;}
 
     /* ===== DİĞER (KİŞİLER VE PANO) ===== */
     .user-list-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface2); border-radius: 16px; margin-bottom: 8px; cursor: pointer;}
     .dm-header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .btn-back { background: none; border: none; color: var(--text-dim); font-size: 1rem; display: flex; align-items: center; gap: 4px; cursor: pointer;}
+    
+    .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); display: inline-block; }
+    .dm-header-title { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-weight: 600; font-size: 1.1rem; margin-right: 40px; }
+    
     .post-card { background: var(--surface2); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .empty-state { text-align: center; color: var(--text-dim); padding: 40px; }
@@ -175,25 +175,51 @@
 
 <div id="loading-screen"><div class="spinner"></div></div>
 
-<div class="guide-overlay" id="guide-overlay" onclick="closeGuide()"></div>
-<div class="guide-modal" id="guide-modal">
+<div class="modal-overlay" id="settings-overlay" onclick="closeSettings()"></div>
+<div class="custom-modal" id="settings-modal">
+  <button class="quote-close" onclick="closeSettings()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
+  <h2 style="color:var(--text); margin-bottom:20px; text-align:center; font-family:var(--font-brand);">Profil Ayarları</h2>
+  <div class="input-group" style="margin-bottom:12px;">
+    <label>Yeni Takma Ad</label>
+    <input type="text" id="settings-nick" placeholder="Aynı kalacaksa değiştirme" />
+  </div>
+  <div class="input-group" style="margin-bottom:12px;">
+    <label>Yeni Parola <span style="font-size:0.7rem; color:var(--text-dim);text-transform:none;">(Boş bırakılabilir)</span></label>
+    <input type="password" id="settings-new-pass" placeholder="Yeni parolan" />
+  </div>
+  <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+  <div class="input-group" style="margin-bottom:20px;">
+    <label style="color:#ef4444;">Güvenlik Doğrulaması</label>
+    <input type="password" id="settings-current-pass" placeholder="Mevcut Parolan (Zorunlu)" />
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn-primary" onclick="closeSettings()" style="background:var(--surface2); color:var(--text);">İptal</button>
+    <button class="btn-primary" onclick="updateProfile()">Kaydet</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="guide-overlay" onclick="closeGuide()"></div>
+<div class="custom-modal" id="guide-modal">
   <button class="quote-close" onclick="closeGuide()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
   <h2 style="color:var(--text); margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px; font-family:var(--font-brand);">
     <img src="logo.png" width="32" onerror="this.style.display='none'"> İlim İrfan
   </h2>
-  <p style="font-size:0.95rem; line-height:1.5; color:var(--text); margin-bottom:20px; text-align:center;">
-    Bilgi ve mizahın buluştuğu yere hoş geldin!<br>İşte uygulamanın bazı özellikleri:
+  <p style="font-size:0.95rem; line-height:1.5; color:var(--text-dim); margin-bottom:20px; text-align:center;">
+    Bilgi ve mizahın buluştuğu yere hoş geldin!<br>Kısaca neler yapabileceğine göz atalım:
   </p>
+  
   <ul class="guide-list">
-    <li><strong>Sohbet & DM:</strong> Alt menüden genel sohbete, kişilere (Özel Mesaj) veya panoya hızlıca geçebilirsin.</li>
-    <li><strong>Mesaj Yanıtlama (Alıntı):</strong> Bir mesaja yanıt vermek için baloncuk üzerine <b>tıkla</b> veya mesajı sağa doğru <b>kaydır (swipe)</b>.</li>
-    <li><strong>Mesaj Silme:</strong> Kendi gönderdiğin bir mesajı silmek için üzerine tıklayıp <b>Sil</b> seçeneğini kullanabilirsin.</li>
-    <li><strong>Sticker & Meme:</strong> Mesaj kutusunun solundaki <b>😜</b> ikonuna tıklayarak medyaları açabilir, <b>+ Yeni Ekle</b> butonu ile kendi komik fotoğraf veya seslerini gruba ekleyebilirsin.</li>
-    <li><strong>Sesli Mesaj:</strong> <b>🎙️</b> ikonuna bir kez dokun kayıt başlasın, bitince tekrar dokun gönderilsin.</li>
-    <li><strong>Gece/Gündüz Modu:</strong> Üstteki ☀️/🌙 ikonuna tıklayarak temayı değiştirebilirsin. Gözlerini yorma!</li>
+    <li><strong>🟢 Çevrimiçi & Yazıyor...</strong> Kişiler listesindeki yeşil nokta o an aktif olanları gösterir. Birisi sana mesaj yazarken anında bildirimini görebilirsin.</li>
+    <li><strong>↩️ Kaydırarak Yanıtla</strong> Bir mesaja hızlıca yanıt vermek (alıntılamak) için baloncuğun üzerine dokun veya mesajı sağa doğru <b>kaydır (swipe)</b>.</li>
+    <li><strong>🗑️ Mesaj Silme</strong> Gönderdiğin bir mesaja dokunup <b>Sil</b> diyerek kelamını herkesin ekranından anında silebilirsin.</li>
+    <li><strong>😜 Sticker & Meme Sesleri</strong> Mesaj kutusundaki emoji butonuna basarak gruba özel sticker ve komik sesler atabilir, <b>+ Yeni Ekle</b> ile listeyi genişletebilirsin.</li>
+    <li><strong>🎙️ Sesli Mesaj</strong> Mikrofon ikonuna bir kez dokun kayda başla, bitince tekrar dokun ve gönder!</li>
+    <li><strong>⚙️ Profil Ayarları</strong> Sağ üstteki ismine dokunarak şifreni veya nickini güncelleyebilirsin. Yeni ismin anında tüm sohbetlerine yansır.</li>
+    <li><strong>🌓 Gece/Gündüz Modu</strong> Üstteki ☀️/🌙 butonuyla temayı göz zevkine göre ayarla.</li>
   </ul>
+
   <div style="margin-top:20px; text-align:center;">
-    <button class="btn-primary" onclick="closeGuide()">Anladım, Başlayalım!</button>
+    <button class="btn-primary" onclick="closeGuide()">Anladım, Hadi Başlayalım!</button>
   </div>
 </div>
 
@@ -217,7 +243,10 @@
     </div>
     <div class="header-right">
       <button class="btn-icon" id="theme-btn" title="Temayı Değiştir">☀️</button>
-      <div class="user-badge"><div class="user-avatar" id="header-avatar"></div><span class="user-nick" id="header-nick"></span></div>
+      <div class="user-badge" onclick="openSettings()" title="Ayarlar">
+        <div class="user-avatar" id="header-avatar"></div>
+        <span class="user-nick" id="header-nick"></span>
+      </div>
       <button class="btn-icon" id="logout-btn">🚪</button>
     </div>
   </header>
@@ -225,6 +254,7 @@
   <div class="tab-content active" id="tab-messages">
     <div class="scroll-area" id="messages-list"></div>
     <div class="input-wrapper">
+      <div class="typing-indicator" id="global-typing"></div>
       <div class="quote-preview" id="global-quote-preview">
         <div class="quote-preview-content">
           <span class="quote-preview-nick" id="global-quote-nick"></span>
@@ -246,10 +276,14 @@
     <div id="dm-chat-view" style="display:none; flex-direction:column; height:100%;">
       <div class="dm-header">
         <button class="btn-back" id="dm-back-btn">← Geri</button>
-        <strong style="flex:1; text-align:center; padding-right:40px;" id="dm-chat-title">Nick</strong>
+        <div class="dm-header-title">
+          <span id="dm-chat-title">Nick</span>
+          <span id="dm-chat-online-dot" class="online-dot" style="display:none;"></span>
+        </div>
       </div>
       <div class="scroll-area" id="dm-messages-list"></div>
       <div class="input-wrapper">
+        <div class="typing-indicator" id="dm-typing"></div>
         <div class="quote-preview" id="dm-quote-preview">
           <div class="quote-preview-content">
             <span class="quote-preview-nick" id="dm-quote-nick"></span>
@@ -320,7 +354,12 @@
   let activeDrawerTarget = 'global'; 
   let isRecording = false, mediaRecorder = null, audioChunks = [];
 
-  // TEMA (Karanlık/Aydınlık) AYARLARI
+  let realtimeChannel = null; 
+  let onlineUsers = new Set(); 
+  let typingUsers = { global: new Set(), dm: new Set() }; 
+  let typingTimers = { global: null, dm: null };
+
+  // TEMA
   const savedTheme = localStorage.getItem('ilimirfan_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
   document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
@@ -333,22 +372,38 @@
     document.getElementById('theme-btn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // ===== KILAVUZ (WELCOME MODAL) KONTROLÜ =====
+  // ===== KILAVUZ & AYARLAR =====
   function openGuide() {
-    document.getElementById('guide-overlay').style.display = 'block';
-    document.getElementById('guide-modal').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('guide-overlay').classList.add('show');
-      document.getElementById('guide-modal').classList.add('show');
-    }, 10);
+    document.getElementById('guide-overlay').style.display = 'block'; document.getElementById('guide-modal').style.display = 'block';
+    setTimeout(() => { document.getElementById('guide-overlay').classList.add('show'); document.getElementById('guide-modal').classList.add('show'); }, 10);
   }
   function closeGuide() {
-    document.getElementById('guide-overlay').classList.remove('show');
-    document.getElementById('guide-modal').classList.remove('show');
-    setTimeout(() => {
-      document.getElementById('guide-overlay').style.display = 'none';
-      document.getElementById('guide-modal').style.display = 'none';
-    }, 300);
+    document.getElementById('guide-overlay').classList.remove('show'); document.getElementById('guide-modal').classList.remove('show');
+    setTimeout(() => { document.getElementById('guide-overlay').style.display = 'none'; document.getElementById('guide-modal').style.display = 'none'; }, 300);
+  }
+
+  function openSettings() {
+    document.getElementById('settings-nick').value = currentNick; document.getElementById('settings-current-pass').value = ''; document.getElementById('settings-new-pass').value = '';
+    document.getElementById('settings-overlay').style.display = 'block'; document.getElementById('settings-modal').style.display = 'block';
+    setTimeout(() => { document.getElementById('settings-overlay').classList.add('show'); document.getElementById('settings-modal').classList.add('show'); }, 10);
+  }
+  function closeSettings() {
+    document.getElementById('settings-overlay').classList.remove('show'); document.getElementById('settings-modal').classList.remove('show');
+    setTimeout(() => { document.getElementById('settings-overlay').style.display = 'none'; document.getElementById('settings-modal').style.display = 'none'; }, 300);
+  }
+
+  async function updateProfile() {
+    const newNick = document.getElementById('settings-nick').value.trim(), currentPass = document.getElementById('settings-current-pass').value.trim(), newPass = document.getElementById('settings-new-pass').value.trim();
+    if (!currentPass) return showToast('Mevcut parola zorunlu!'); if (newNick.length < 2) return showToast('Nick en az 2 karakter olmalı!');
+    const hashedCurrent = await hashPass(currentPass);
+    const { data: users } = await db.from('users').select('password').eq('nick', currentNick);
+    if (!users || users.length === 0 || users[0].password !== hashedCurrent) return showToast('Mevcut parola hatalı!');
+    if (newNick !== currentNick) { const { data: existing } = await db.from('users').select('nick').eq('nick', newNick); if (existing && existing.length > 0) return showToast('Bu nick zaten kullanılıyor!'); }
+    const finalPass = newPass ? await hashPass(newPass) : hashedCurrent;
+    const { error } = await db.rpc('change_profile', { old_nick: currentNick, new_nick: newNick, new_password: finalPass });
+    if (error) return showToast('Güncelleme başarısız: ' + error.message);
+    showToast('Profil güncellendi!'); currentNick = newNick; localStorage.setItem('ilimirfan_nick', newNick); closeSettings();
+    setTimeout(() => location.reload(), 1500); 
   }
 
   function escape(str) { return String(str||'').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
@@ -357,7 +412,6 @@
   function scrollToBottom(id) { const el=document.getElementById(id); if(el) el.scrollTop=el.scrollHeight; }
   function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 
-  // Ekranda bir yere tıklanınca açık menüleri kapatır
   document.addEventListener('click', closeActionMenus);
   document.querySelectorAll('.scroll-area').forEach(sa => sa.addEventListener('scroll', closeActionMenus));
 
@@ -385,11 +439,7 @@
       document.getElementById('loading-screen').style.opacity='0'; 
       setTimeout(()=> {
         document.getElementById('loading-screen').style.display='none';
-        // Yeni girişse veya ilk defa giriyorsa kılavuzu otomatik açalım (Opsiyonel)
-        if (isNewLogin && !localStorage.getItem('ilimirfan_guide_seen')) {
-          openGuide();
-          localStorage.setItem('ilimirfan_guide_seen', 'true');
-        }
+        if (isNewLogin && !localStorage.getItem('ilimirfan_guide_seen')) { openGuide(); localStorage.setItem('ilimirfan_guide_seen', 'true'); }
       }, 400); 
     }, 200);
   }
@@ -407,6 +457,22 @@
     document.getElementById('msg-badge').style.display=unreadMsgs>0?'block':'none'; document.getElementById('msg-badge').textContent=unreadMsgs;
     document.getElementById('post-badge').style.display=unreadPosts>0?'block':'none'; document.getElementById('post-badge').textContent=unreadPosts;
     const dmTot=Object.values(unreadDmMap).reduce((a,b)=>a+b,0); document.getElementById('dm-badge').style.display=dmTot>0?'block':'none'; document.getElementById('dm-badge').textContent=dmTot;
+  }
+
+  // YAZIYOR... GÖNDERİMİ
+  function sendTypingStatus(context, isTyping) {
+    if (!realtimeChannel) return;
+    const receiver = context === 'dm' ? activeDmUser : null;
+    realtimeChannel.send({ type: 'broadcast', event: 'typing', payload: { nick: currentNick, context, isTyping, receiver } });
+  }
+  function handleTypingInput(context) {
+    sendTypingStatus(context, true); clearTimeout(typingTimers[context]);
+    typingTimers[context] = setTimeout(() => { sendTypingStatus(context, false); }, 2000);
+  }
+  function updateTypingUI(context) {
+    const el = document.getElementById(`${context}-typing`); const users = Array.from(typingUsers[context]);
+    if (users.length === 0) { el.classList.remove('show'); setTimeout(() => { if(Array.from(typingUsers[context]).length === 0) el.textContent = ''; }, 300); } 
+    else { el.textContent = users.length === 1 ? `${users[0]} yazıyor...` : `${users.join(', ')} yazıyor...`; el.classList.add('show'); }
   }
 
   // ===== MESAJ RENDER SİSTEMİ =====
@@ -435,8 +501,7 @@
     }
 
     const div = document.createElement('div'); 
-    div.className = 'msg-item' + (isOwn ? ' own' : '');
-    div.setAttribute('data-id', m.id); 
+    div.className = 'msg-item' + (isOwn ? ' own' : ''); div.setAttribute('data-id', m.id); 
     
     div.innerHTML = `
       <div class="msg-avatar">${sender.substring(0,2).toUpperCase()}</div>
@@ -446,56 +511,28 @@
         <div class="msg-time">${fmtTime(m.created_at)}</div>
       </div>`;
       
-    // 1. TIKLAYARAK MENÜ AÇMA (Yanıtla / Sil)
     const bubble = div.querySelector('.msg-bubble');
     bubble.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeActionMenus();
-      
-      const menu = document.createElement('div');
-      menu.className = 'msg-action-menu';
-      
+      e.stopPropagation(); closeActionMenus();
+      const menu = document.createElement('div'); menu.className = 'msg-action-menu';
       let menuHtml = `<div class="menu-action" onclick="event.stopPropagation(); setQuote('${escape(sender)}', '${quoteContentPrev}', '${listId==='messages-list'?'global':'dm'}'); closeActionMenus();">↩ Yanıtla</div>`;
-      if (isOwn) {
-        menuHtml += `<div class="menu-action menu-danger" onclick="event.stopPropagation(); deleteMessage('${m.id}', '${listId}'); closeActionMenus();">🗑️ Sil</div>`;
-      }
-      menu.innerHTML = menuHtml;
-      
-      bubble.appendChild(menu);
+      if (isOwn) menuHtml += `<div class="menu-action menu-danger" onclick="event.stopPropagation(); deleteMessage('${m.id}', '${listId}'); closeActionMenus();">🗑️ Sil</div>`;
+      menu.innerHTML = menuHtml; bubble.appendChild(menu);
     });
 
-    // 2. KAYDIRARAK (SWIPE) YANITLA
     let touchStartX = 0;
     bubble.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
-    bubble.addEventListener('touchmove', e => {
-      let diff = e.changedTouches[0].screenX - touchStartX;
-      if (diff > 10 && diff < 80) bubble.style.transform = `translateX(${diff}px)`; 
-    }, {passive:true});
-    bubble.addEventListener('touchend', e => {
-      bubble.style.transform = `translateX(0)`; 
-      if (e.changedTouches[0].screenX - touchStartX > 50) { 
-        setQuote(sender, quoteContentPrev, listId==='messages-list'?'global':'dm');
-      }
-    });
+    bubble.addEventListener('touchmove', e => { let diff = e.changedTouches[0].screenX - touchStartX; if (diff > 10 && diff < 80) bubble.style.transform = `translateX(${diff}px)`; }, {passive:true});
+    bubble.addEventListener('touchend', e => { bubble.style.transform = `translateX(0)`; if (e.changedTouches[0].screenX - touchStartX > 50) setQuote(sender, quoteContentPrev, listId==='messages-list'?'global':'dm'); });
 
     list.appendChild(div);
     if (list.scrollHeight - list.scrollTop - list.clientHeight < 200 || isOwn) scrollToBottom(listId);
   }
 
   function closeActionMenus() { document.querySelectorAll('.msg-action-menu').forEach(m => m.remove()); }
-
-  // Alıntı UI Ayarlama
-  function setQuote(nick, content, context) {
-    quoteState[context] = { nick, content };
-    const prev = document.getElementById(`${context}-quote-preview`);
-    prev.style.display = 'flex';
-    document.getElementById(`${context}-quote-nick`).textContent = nick;
-    document.getElementById(`${context}-quote-text`).textContent = content;
-    document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus();
-  }
+  function setQuote(nick, content, context) { quoteState[context] = { nick, content }; document.getElementById(`${context}-quote-preview`).style.display = 'flex'; document.getElementById(`${context}-quote-nick`).textContent = nick; document.getElementById(`${context}-quote-text`).textContent = content; document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus(); }
   function cancelQuote(context) { quoteState[context]=null; document.getElementById(`${context}-quote-preview`).style.display='none'; }
 
-  // Ses Kaydı
   async function toggleRecording(context) {
     const btn = document.getElementById(`${context}-mic-btn`);
     if(isRecording) { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); showToast('Gönderiliyor...'); return; }
@@ -512,15 +549,12 @@
     } catch(e) { showToast('Mikrofon izni gerekli!'); }
   }
 
-  // Mesaj Gönderim
   async function sendActualMessage(context, textContent) {
     const q = quoteState[context];
     if(context==='global') await db.from('messages').insert({ nick: currentNick, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
     else await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
-    cancelQuote(context);
+    cancelQuote(context); sendTypingStatus(context, false);
   }
-
-  // Mesaj Silme İşlemi
   async function deleteMessage(messageId, listId) {
     const table = listId === 'messages-list' ? 'messages' : 'private_messages';
     const { error } = await db.from(table).delete().eq('id', messageId);
@@ -529,25 +563,17 @@
 
   document.getElementById('msg-send-btn').addEventListener('click', () => { const i=document.getElementById('msg-input'); if(i.value.trim()){ sendActualMessage('global', i.value.trim()); i.value=''; i.style.height='auto'; }});
   document.getElementById('dm-send-btn').addEventListener('click', () => { const i=document.getElementById('dm-input'); if(i.value.trim()){ sendActualMessage('dm', i.value.trim()); i.value=''; i.style.height='auto'; }});
+  
   ['msg-input', 'dm-input'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); }});
-    document.getElementById(id).addEventListener('input', function() { autoResize(this); });
+    const context = id === 'msg-input' ? 'global' : 'dm'; const el = document.getElementById(id);
+    el.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(id.replace('input','send-btn')).click(); } });
+    el.addEventListener('input', function() { autoResize(this); handleTypingInput(context); });
   });
 
-  // ===== ÇEKMECE (STICKER & MEME) =====
-  function openMediaDrawer(target) {
-    activeDrawerTarget = target; document.getElementById('drawer-overlay').style.display='block';
-    setTimeout(() => { document.getElementById('drawer-overlay').style.opacity='1'; document.getElementById('media-drawer').classList.add('open'); }, 10);
-  }
-  function closeMediaDrawer() {
-    document.getElementById('media-drawer').classList.remove('open'); document.getElementById('drawer-overlay').style.opacity='0';
-    setTimeout(() => document.getElementById('drawer-overlay').style.display='none', 300);
-  }
-  function switchDrawer(tab) {
-    document.querySelectorAll('.drawer-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.drawer-content').forEach(c=>c.classList.remove('active'));
-    document.getElementById('tab-'+tab).classList.add('active'); document.getElementById('content-'+tab).classList.add('active');
-    document.getElementById('media-upload').accept = tab==='stickers' ? 'image/*' : 'audio/*';
-  }
+  // ===== ÇEKMECE =====
+  function openMediaDrawer(target) { activeDrawerTarget = target; document.getElementById('drawer-overlay').style.display='block'; setTimeout(() => { document.getElementById('drawer-overlay').style.opacity='1'; document.getElementById('media-drawer').classList.add('open'); }, 10); }
+  function closeMediaDrawer() { document.getElementById('media-drawer').classList.remove('open'); document.getElementById('drawer-overlay').style.opacity='0'; setTimeout(() => document.getElementById('drawer-overlay').style.display='none', 300); }
+  function switchDrawer(tab) { document.querySelectorAll('.drawer-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.drawer-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active'); document.getElementById('content-'+tab).classList.add('active'); document.getElementById('media-upload').accept = tab==='stickers' ? 'image/*' : 'audio/*'; }
 
   async function loadMediaAssets() {
     const { data: sData } = await db.from('stickers').select('*').order('created_at', {ascending:false});
@@ -569,39 +595,64 @@
     const {data, error} = await db.storage.from(bucket).upload(`${Date.now()}_${file.name.replace(/\s+/g,'_')}`, file);
     if(error) return showToast('Yükleme hatası');
     const url = db.storage.from(bucket).getPublicUrl(data.path).data.publicUrl;
-    
-    const row = { url: url, added_by: currentNick };
-    if (!isImage) row.name = name;
-    await db.from(table).insert([row]); 
-    showToast('Eklendi!'); loadMediaAssets(); e.target.value='';
+    const row = { url: url, added_by: currentNick }; if (!isImage) row.name = name;
+    await db.from(table).insert([row]); showToast('Eklendi!'); loadMediaAssets(); e.target.value='';
   }
 
-  // ===== VERİ ÇEKME =====
+  // ===== VERİ ÇEKME & YENİLEME =====
   async function loadMessages() { const {data}=await db.from('messages').select('*').order('created_at',{ascending:true}).limit(100); document.getElementById('messages-list').innerHTML=''; if(data) data.forEach(m=>appendHtmlMessage(m, 'messages-list')); setTimeout(()=>scrollToBottom('messages-list'),100); }
   async function fetchAllUsers() { const {data}=await db.from('users').select('nick').order('created_at',{ascending:false}); if(data) { allUsersList=data.filter(u=>u.nick!==currentNick); renderUserList(); } }
+  
   function renderUserList() {
     const list=document.getElementById('dm-user-list'); list.innerHTML='';
-    allUsersList.forEach(u => { const b=unreadDmMap[u.nick]||0; const d=document.createElement('div'); d.className='user-list-item'; d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1">${escape(u.nick)}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; d.onclick=()=>openDm(u.nick); list.appendChild(d); });
+    allUsersList.forEach(u => { 
+      const b = unreadDmMap[u.nick] || 0; const isOnline = onlineUsers.has(u.nick);
+      const d=document.createElement('div'); d.className='user-list-item'; 
+      d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1; display:flex; align-items:center; gap:8px;">${escape(u.nick)} ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : ''}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; 
+      d.onclick=()=>openDm(u.nick); list.appendChild(d); 
+    });
   }
-  async function openDm(nick) { activeDmUser=nick; document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; document.getElementById('dm-chat-title').textContent=nick; if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } const list=document.getElementById('dm-messages-list'); list.innerHTML=''; const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:true}).limit(100); if(data) data.forEach(m=>appendHtmlMessage(m, 'dm-messages-list')); setTimeout(()=>scrollToBottom('dm-messages-list'),100); }
+
+  async function openDm(nick) { 
+    activeDmUser=nick; document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; document.getElementById('dm-chat-title').textContent=nick; 
+    document.getElementById('dm-chat-online-dot').style.display = onlineUsers.has(nick) ? 'inline-block' : 'none';
+    if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } 
+    const list=document.getElementById('dm-messages-list'); list.innerHTML=''; 
+    const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:true}).limit(100); 
+    if(data) data.forEach(m=>appendHtmlMessage(m, 'dm-messages-list')); setTimeout(()=>scrollToBottom('dm-messages-list'),100); 
+  }
   document.getElementById('dm-back-btn').onclick = () => { activeDmUser=null; document.getElementById('dm-chat-view').style.display='none'; document.getElementById('dm-user-list').style.display='flex'; renderUserList(); };
 
   async function loadPosts() { const {data}=await db.from('posts').select('*').order('created_at',{ascending:false}).limit(50); const list=document.getElementById('posts-list'); list.innerHTML=''; if(data) data.forEach(p=>{ const d=document.createElement('div'); d.className='post-card'; d.innerHTML=`<div class="post-header"><div class="user-avatar">${p.nick.substring(0,2).toUpperCase()}</div><div><strong>${escape(p.nick)}</strong><div style="font-size:0.7rem;opacity:0.7">${fmtTime(p.created_at)}</div></div></div><div>${escape(p.content).replace(/\n/g, '<br>')}</div>`; list.appendChild(d); }); }
   document.getElementById('post-send-btn').onclick = async () => { const i=document.getElementById('post-input'); if(i.value.trim()){ await db.from('posts').insert({nick:currentNick, content:i.value.trim()}); i.value=''; i.style.height='auto'; showToast('Pano güncellendi'); } };
 
-  // ===== REALTIME =====
+  // ===== PRESENCE & REALTIME KANALI =====
   function subscribeRealtime() {
-    db.channel('m')
+    if (realtimeChannel) { realtimeChannel.unsubscribe(); }
+    realtimeChannel = db.channel('ilim-irfan-room', { config: { presence: { key: currentNick } } });
+
+    realtimeChannel.on('presence', { event: 'sync' }, () => {
+      const state = realtimeChannel.presenceState(); onlineUsers.clear();
+      for (const id in state) { onlineUsers.add(state[id][0].nick); }
+      if(activeTab === 'dm' && activeDmUser === null) renderUserList();
+      if(activeDmUser) document.getElementById('dm-chat-online-dot').style.display = onlineUsers.has(activeDmUser) ? 'inline-block' : 'none';
+    });
+
+    realtimeChannel.on('broadcast', { event: 'typing' }, payload => {
+      const { nick, context, isTyping, receiver } = payload.payload;
+      if (nick === currentNick) return;
+      if (context === 'global') { if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick); updateTypingUI('global'); } 
+      else if (context === 'dm' && receiver === currentNick) { if (isTyping) typingUsers.dm.add(nick); else typingUsers.dm.delete(nick); updateTypingUI('dm'); }
+    });
+
+    realtimeChannel
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, p=>{ appendHtmlMessage(p.new, 'messages-list'); if(activeTab!=='messages' && p.new.nick!==currentNick){ unreadMsgs++; updateBadges(); } })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
-      .subscribe();
-      
-    db.channel('p')
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'private_messages'}, p=>{ const pm=p.new; if(pm.sender_nick===currentNick || pm.receiver_nick===currentNick) { if(activeDmUser===(pm.sender_nick===currentNick?pm.receiver_nick:pm.sender_nick)) { appendHtmlMessage(pm, 'dm-messages-list'); if(pm.receiver_nick===currentNick && activeTab!=='dm') { unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); } } else if(pm.receiver_nick===currentNick) { unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); if(activeTab==='dm') renderUserList(); } } })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'private_messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
-      .subscribe();
-      
-    db.channel('po').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } }).subscribe();
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } });
+
+    realtimeChannel.subscribe(async (status) => { if (status === 'SUBSCRIBED') { await realtimeChannel.track({ nick: currentNick }); } });
   }
 
   document.getElementById('login-btn').onclick = login;

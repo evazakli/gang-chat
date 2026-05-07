@@ -32,7 +32,7 @@
     /* ===== EKRANLAR ===== */
     #loading-screen, #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; z-index: 9999; transition: opacity .4s ease; }
     .logo-big { font-family: var(--font-brand); font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; }
-    .spinner { width: 40px; height: 40px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s infinite cubic-bezier(0.55, 0.15, 0.45, 0.85); }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s infinite cubic-bezier(0.55, 0.15, 0.45, 0.85); margin: auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .login-card { width: 90%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 20px 40px rgba(0,0,0,.15); transition: background-color 0.3s, border-color 0.3s; }
@@ -104,7 +104,7 @@
     /* GÜVENLİ ETKİLEŞİM MENÜSÜ */
     .msg-action-menu { 
       position: absolute; 
-      bottom: calc(100% + 5px); /* Menü daima yukarı büyür, üstü kesmez */
+      bottom: calc(100% + 5px); 
       background: var(--menu-bg); 
       color: var(--menu-text); 
       padding: 6px; 
@@ -448,13 +448,15 @@
   }
 
   async function fetchWatermarks() {
-    const { data: gData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', 'global').neq('nick', currentNick).order('last_read_at', {ascending: false}).limit(1);
-    if (gData && gData.length) globalReadWatermark = gData[0].last_read_at;
+    try {
+      const { data: gData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', 'global').neq('nick', currentNick).order('last_read_at', {ascending: false}).limit(1);
+      if (gData && gData.length) globalReadWatermark = gData[0].last_read_at;
 
-    if (activeDmUser) {
-      const { data: dData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser);
-      if (dData && dData.length) dmReadWatermark = dData[0].last_read_at;
-    }
+      if (activeDmUser) {
+        const { data: dData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser);
+        if (dData && dData.length) dmReadWatermark = dData[0].last_read_at;
+      }
+    } catch(e) { console.error("Görüldü hatası:", e); }
   }
 
   function updateTicksUI(listId, watermark) {
@@ -500,11 +502,16 @@
     let query;
     if (listId === 'messages-list') query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', 'global').gte('last_read_at', msgCreatedAt).neq('nick', currentNick);
     else query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser).gte('last_read_at', msgCreatedAt);
-    const { data, error } = await query;
-    container.innerHTML = '';
-    if (error) return container.innerHTML = `<div class="empty-state">Hata: ${error.message}</div>`;
-    if (!data || data.length === 0) return container.innerHTML = '<div class="empty-state">Mesajını henüz kimse görmedi.</div>';
-    data.forEach(row => { const div = document.createElement('div'); div.className = 'user-list-item'; div.innerHTML = `<div class="user-avatar">${row.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1">${escape(row.nick)}</strong><span style="color:#3b82f6; font-size:1.2rem; font-weight:bold;">✓✓</span>`; container.appendChild(div); });
+    
+    try {
+      const { data, error } = await query;
+      container.innerHTML = '';
+      if (error) return container.innerHTML = `<div class="empty-state">Hata: Tablo bulunamadı. Lütfen SQL'i çalıştırdığınızdan emin olun.</div>`;
+      if (!data || data.length === 0) return container.innerHTML = '<div class="empty-state">Mesajını henüz kimse görmedi.</div>';
+      data.forEach(row => { const div = document.createElement('div'); div.className = 'user-list-item'; div.innerHTML = `<div class="user-avatar">${row.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1">${escape(row.nick)}</strong><span style="color:#3b82f6; font-size:1.2rem; font-weight:bold;">✓✓</span>`; container.appendChild(div); });
+    } catch(e) {
+      container.innerHTML = `<div class="empty-state">Bağlantı Hatası.</div>`;
+    }
   }
   function closeReadReceipts() { document.getElementById('reads-overlay').classList.remove('show'); document.getElementById('reads-modal').classList.remove('show'); setTimeout(() => { document.getElementById('reads-overlay').style.display = 'none'; document.getElementById('reads-modal').style.display = 'none'; }, 300); }
 
@@ -576,7 +583,10 @@
     const list = document.getElementById(listId); list.innerHTML = '';
     const context = listId === 'messages-list' ? 'global' : 'dm'; lastRenderedDate[context] = null;
     if(!data || data.length === 0) { list.innerHTML = '<div class="empty-state">Sessizlik hakim...</div>'; return; }
-    const lastRead = localStorage.getItem(lastReadKey); let firstUnreadFound = false; const fragment = document.createDocumentFragment();
+    
+    const lastRead = localStorage.getItem(lastReadKey); 
+    let firstUnreadFound = false; 
+    const fragment = document.createDocumentFragment();
 
     data.forEach(m => {
       const msgDate = getDateString(m.created_at);
@@ -585,7 +595,9 @@
       if (lastRead && m.created_at > lastRead && sender !== currentNick && !firstUnreadFound) { const uDiv = document.createElement('div'); uDiv.className = 'unread-divider'; uDiv.id = `unread-marker-${context}`; uDiv.innerHTML = `<span>Yeni Mesajlar</span>`; fragment.appendChild(uDiv); firstUnreadFound = true; }
       fragment.appendChild(createMessageElement(m, listId, true));
     });
+    
     list.appendChild(fragment);
+    
     if (firstUnreadFound) { const marker = document.getElementById(`unread-marker-${context}`); if (marker) marker.scrollIntoView({behavior: 'auto', block: 'center'}); } else { scrollToBottom(listId, true); }
     localStorage.setItem(lastReadKey, data[data.length-1].created_at); syncReadStatus(context === 'global' ? 'global' : `dm_${activeDmUser}`);
   }
@@ -608,7 +620,7 @@
     }
   }
 
-  // DÜZELTİLDİ: Menü OLuşturma Artık Kırılmaz (DOM objesiyle)
+  // DÜZELTİLDİ: DOM ile Güvenli Menü Oluşturma
   function createMessageElement(m, listId, isInitialLoad) {
     const sender = m.nick || m.sender_nick, isOwn = sender === currentNick;
     let contentHtml = '', quoteContentPrev = '';
@@ -616,7 +628,7 @@
     if (m.content.startsWith('[STICKER]')) { quoteContentPrev = '🖼️ Sticker'; contentHtml = `<img src="${escape(m.content.replace('[STICKER]', ''))}" class="msg-sticker-img" />`; } 
     else if (m.content.startsWith('[MEMESOUND]')) { const parts = m.content.replace('[MEMESOUND]', '').split('||'); quoteContentPrev = '🎵 ' + (parts[1]||'Ses'); contentHtml = `<button class="btn-meme-play" onclick="new Audio('${escape(parts[0])}').play()">▶️ ${escape(parts[1]||'Ses')}</button>`; } 
     else if (m.content.startsWith('[AUDIO]')) { quoteContentPrev = '🎙️ Sesli Mesaj'; contentHtml = `<audio controls src="${escape(m.content.replace('[AUDIO]', ''))}"></audio>`; } 
-    else { contentHtml = `<div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div>`; quoteContentPrev = m.content; }
+    else { contentHtml = `<div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div>`; quoteContentPrev = m.content; } // Kaçış (escape) yapmıyoruz çünkü içerde saf data lazım
 
     let quoteHtml = ''; if (m.quoted_nick && m.quoted_content) quoteHtml = `<div class="msg-quote"><strong>${escape(m.quoted_nick)}</strong> ${escape(m.quoted_content)}</div>`;
 
@@ -634,22 +646,33 @@
     div.innerHTML = `<div class="msg-avatar">${sender.substring(0,2).toUpperCase()}</div><div class="msg-bubble ${m.content.startsWith('[STICKER]') ? 'is-sticker' : ''}"><div class="msg-nick">${escape(sender)}</div>${quoteHtml}${contentHtml}<div class="msg-time">${fmtTime(m.created_at)}${ticksHtml}</div></div>`;
       
     const bubble = div.querySelector('.msg-bubble');
+    
+    // Güvenli Tıklama Olayı
     bubble.addEventListener('click', (e) => {
       e.stopPropagation(); closeActionMenus();
       
       const menu = document.createElement('div'); 
       menu.className = 'msg-action-menu';
       
-      const btnReply = document.createElement('div'); btnReply.className = 'menu-action'; btnReply.innerHTML = '↩ Yanıtla';
+      // Yanıtla Butonu
+      const btnReply = document.createElement('div'); 
+      btnReply.className = 'menu-action'; 
+      btnReply.innerHTML = '↩ Yanıtla';
       btnReply.onclick = (ev) => { ev.stopPropagation(); setQuote(sender, quoteContentPrev, listId === 'messages-list' ? 'global' : 'dm'); closeActionMenus(); };
       menu.appendChild(btnReply);
 
       if (isOwn) {
-        const btnViews = document.createElement('div'); btnViews.className = 'menu-action'; btnViews.innerHTML = '👁️ Kimler Gördü?';
+        // Kimler Gördü Butonu
+        const btnViews = document.createElement('div'); 
+        btnViews.className = 'menu-action'; 
+        btnViews.innerHTML = '👁️ Kimler Gördü?';
         btnViews.onclick = (ev) => { ev.stopPropagation(); openReadReceipts(m.created_at, listId); closeActionMenus(); };
         menu.appendChild(btnViews);
 
-        const btnDel = document.createElement('div'); btnDel.className = 'menu-action menu-danger'; btnDel.innerHTML = '🗑️ Sil';
+        // Sil Butonu
+        const btnDel = document.createElement('div'); 
+        btnDel.className = 'menu-action menu-danger'; 
+        btnDel.innerHTML = '🗑️ Sil';
         btnDel.onclick = (ev) => { ev.stopPropagation(); deleteMessage(m.id, listId); closeActionMenus(); };
         menu.appendChild(btnDel);
       }
@@ -741,11 +764,13 @@
     await db.from(table).insert([row]); showToast('Eklendi!'); loadMediaAssets(); e.target.value='';
   }
 
-  // ===== VERİ ÇEKME =====
+  // ===== VERİ ÇEKME (HIZLANDIRILMIŞ) =====
   async function loadMessages() { 
-    await fetchWatermarks(); 
+    // DÜZELTME: Ekranı bekletmemek için mesajlar anında çekiliyor
     const {data}=await db.from('messages').select('*').order('created_at',{ascending:false}).limit(100); 
     if(data) { data.reverse(); renderAllMessages(data, 'messages-list', 'last_read_global'); }
+    // Mavi tikler mesajlar çizildikten sonra asenkron olarak boyanır
+    fetchWatermarks().then(() => updateTicksUI('messages-list', globalReadWatermark));
   }
   
   async function fetchAllUsers() { const {data}=await db.from('users').select('nick').order('created_at',{ascending:false}); if(data) { allUsersList=data.filter(u=>u.nick!==currentNick); renderUserList(); } }
@@ -763,9 +788,12 @@
     const dot = document.getElementById('dm-chat-status-dot'); dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot'; dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
     if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } 
     
-    await fetchWatermarks(); 
+    document.getElementById('dm-messages-list').innerHTML = '<div class="spinner" style="margin:20px auto"></div>';
+    
     const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:false}).limit(100); 
     if(data) { data.reverse(); renderAllMessages(data, 'dm-messages-list', `last_read_dm_${nick}`); }
+    
+    fetchWatermarks().then(() => updateTicksUI('dm-messages-list', dmReadWatermark));
   }
   document.getElementById('dm-back-btn').onclick = () => { activeDmUser=null; document.getElementById('dm-chat-view').style.display='none'; document.getElementById('dm-user-list').style.display='flex'; renderUserList(); };
 

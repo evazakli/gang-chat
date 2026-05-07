@@ -136,11 +136,17 @@
     .drawer-content.active { display: block; }
     
     .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px; }
-    .sticker-item { width: 100%; aspect-ratio: 1; background: var(--surface2); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 4px; cursor: pointer; }
-    .sticker-item img { width: 100%; height: 100%; object-fit: contain; }
+    
+    /* GÜNCEL STICKER/MEME ITEM'LARI (iOS UYUMU İÇİN BUTTON) */
+    .sticker-item { width: 100%; aspect-ratio: 1; background: var(--surface2); border: none; outline: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 4px; cursor: pointer; transition: transform 0.2s; }
+    .sticker-item:active { transform: scale(0.95); }
+    .sticker-item img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    
     .meme-list { display: flex; flex-direction: column; gap: 8px; }
-    .meme-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface2); border-radius: 12px; cursor: pointer; }
-    .meme-item-icon { font-size: 1.5rem; }
+    .meme-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface2); border: none; outline: none; border-radius: 12px; cursor: pointer; width: 100%; text-align: left; color: inherit; font-family: inherit; transition: transform 0.2s; }
+    .meme-item:active { transform: scale(0.98); }
+    .meme-item-icon { font-size: 1.5rem; pointer-events: none; }
+    
     .drawer-footer { padding: 12px 16px; border-top: 1px solid var(--border); padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     .btn-upload { background: var(--surface2); border: 1px dashed var(--accent); color: var(--accent); border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
 
@@ -262,7 +268,7 @@
         <div class="user-avatar" id="header-avatar"></div>
         <span class="user-nick" id="header-nick"></span>
       </div>
-      <button class="btn-icon" id="logout-btn">🚪</button>
+      <button class="btn-icon" id="logout-btn" title="Çıkış">🚪</button>
     </div>
   </header>
 
@@ -603,21 +609,17 @@
 
   // ===== MESAJ SİLME =====
   async function deleteMessage(messageId, listId) {
-    // 1. Ekrandan anında gizle (UI Hilesi)
     const el = document.querySelector(`.msg-item[data-id="${messageId}"]`);
     if (el) el.style.display = 'none';
 
     const table = listId === 'messages-list' ? 'messages' : 'private_messages';
-    
-    // 2. Veritabanından sil ve dönen veriyi bekle
     const { data, error } = await db.from(table).delete().eq('id', messageId).select();
 
-    // 3. RLS engellediyse mesajı geri getir ve hata ver
     if (error || !data || data.length === 0) {
       if (el) el.style.display = 'flex';
       showToast('⚠️ Silinemedi. Sayfayı yenileyin.');
     } else {
-      if (el) el.remove(); // DOM'dan kalıcı olarak temizle
+      if (el) el.remove(); 
     }
   }
 
@@ -638,12 +640,20 @@
   async function loadMediaAssets() {
     const { data: sData } = await db.from('stickers').select('*').order('created_at', {ascending:false});
     const sContainer = document.getElementById('sticker-grid-container'); sContainer.innerHTML='';
-    if(sData && sData.length) sData.forEach(s => { const d=document.createElement('div'); d.className='sticker-item'; d.innerHTML=`<img src="${s.url}"/>`; d.onclick=()=>{ sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); closeMediaDrawer(); }; sContainer.appendChild(d); });
+    if(sData && sData.length) sData.forEach(s => { 
+      const btn = document.createElement('button'); btn.className='sticker-item'; btn.innerHTML=`<img src="${s.url}" style="pointer-events:none;"/>`; 
+      btn.onclick=(e)=>{ e.preventDefault(); sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); closeMediaDrawer(); }; 
+      sContainer.appendChild(btn); 
+    });
     else sContainer.innerHTML='<div class="empty-state" style="grid-column:1/-1">Sticker yok.</div>';
     
     const { data: mData } = await db.from('meme_sounds').select('*').order('created_at', {ascending:false});
     const mContainer = document.getElementById('meme-list-container'); mContainer.innerHTML='';
-    if(mData && mData.length) mData.forEach(m => { const d=document.createElement('div'); d.className='meme-item'; d.innerHTML=`<div class="meme-item-icon">🎵</div><div style="flex:1"><strong>${escape(m.name)}</strong></div>`; d.onclick=()=>{ sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); closeMediaDrawer(); }; mContainer.appendChild(d); });
+    if(mData && mData.length) mData.forEach(m => { 
+      const btn = document.createElement('button'); btn.className='meme-item'; btn.innerHTML=`<div class="meme-item-icon" style="pointer-events:none;">🎵</div><div style="flex:1; pointer-events:none;"><strong>${escape(m.name)}</strong></div>`; 
+      btn.onclick=(e)=>{ e.preventDefault(); sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); closeMediaDrawer(); }; 
+      mContainer.appendChild(btn); 
+    });
     else mContainer.innerHTML='<div class="empty-state">Ses yok.</div>';
   }
 
@@ -752,7 +762,7 @@
 
   document.getElementById('login-btn').onclick = login;
   document.getElementById('password-input').onkeydown = e => { if(e.key==='Enter') login(); };
-  document.getElementById('logout-btn').onclick = confirmLogout; // Eski doğrudan çıkışı İptal Ettik, Destur Modalını Bağladık
+  document.getElementById('logout-btn').onclick = confirmLogout; 
 
   (async function init() { if(currentNick) showApp(); else { document.getElementById('login-screen').style.display='flex'; hideLoading(); } })();
 </script>

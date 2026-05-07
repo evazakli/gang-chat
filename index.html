@@ -461,27 +461,48 @@
 
   // Medyaları Veritabanından Çek
   async function loadMediaAssets() {
-    const { data: sData } = await db.from('stickers').select('*').order('created_at', {ascending:false});
-    const { data: mData } = await db.from('meme_sounds').select('*').order('created_at', {ascending:false});
+    // STICKERLARI ÇEK
+    const { data: sData, error: sErr } = await db.from('stickers').select('*').order('created_at', {ascending:false});
     
-    const sContainer = document.getElementById('sticker-grid-container'); sContainer.innerHTML='';
-    if(sData && sData.length) {
-      sData.forEach(s => {
-        const div = document.createElement('div'); div.className='sticker-item';
-        div.innerHTML = `<img src="${s.url}" />`;
-        div.onclick = () => { sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); closeMediaDrawer(); };
-        sContainer.appendChild(div);
-      });
+    if (sErr) {
+      console.error("Sticker Hatası:", sErr);
+      showToast("Sticker hatası: " + sErr.message);
     }
 
-    const mContainer = document.getElementById('meme-list-container'); mContainer.innerHTML='';
-    if(mData && mData.length) {
-      mData.forEach(m => {
-        const div = document.createElement('div'); div.className='meme-item';
-        div.innerHTML = `<div class="meme-item-icon">🎵</div><div class="meme-item-name">${escape(m.name)}</div><div style="font-size:0.7rem; color:var(--text-dim)">Ekleyen: ${escape(m.added_by)}</div>`;
-        div.onclick = () => { sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); closeMediaDrawer(); };
-        mContainer.appendChild(div);
+    const sContainer = document.getElementById('sticker-grid-container'); 
+    sContainer.innerHTML = '';
+    
+    if(sData && sData.length > 0) {
+      sData.forEach(s => { 
+        const d = document.createElement('div'); d.className='sticker-item'; 
+        d.innerHTML=`<img src="${s.url}"/>`; 
+        d.onclick=()=>{ sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); closeMediaDrawer(); }; 
+        sContainer.appendChild(d); 
       });
+    } else {
+      sContainer.innerHTML = '<div class="empty-state">Henüz sticker yok.</div>';
+    }
+    
+    // MEME SESLERİNİ ÇEK
+    const { data: mData, error: mErr } = await db.from('meme_sounds').select('*').order('created_at', {ascending:false});
+    
+    if (mErr) {
+      console.error("Meme Hatası:", mErr);
+      showToast("Ses hatası: " + mErr.message);
+    }
+
+    const mContainer = document.getElementById('meme-list-container'); 
+    mContainer.innerHTML = '';
+    
+    if(mData && mData.length > 0) {
+      mData.forEach(m => { 
+        const d = document.createElement('div'); d.className='meme-item'; 
+        d.innerHTML=`<div class="meme-item-icon">🎵</div><div style="flex:1"><strong>${escape(m.name)}</strong></div>`; 
+        d.onclick=()=>{ sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); closeMediaDrawer(); }; 
+        mContainer.appendChild(d); 
+      });
+    } else {
+      mContainer.innerHTML = '<div class="empty-state">Henüz ses yok.</div>';
     }
   }
 

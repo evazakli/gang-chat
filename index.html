@@ -73,9 +73,11 @@
     @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
     .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; scroll-behavior: smooth;}
 
-    /* ===== AYRAÇLAR & FAB BUTONU ===== */
+    /* YENİ: WHATSAPP TARZI TARİH VE OKUNMAMIŞ AYRAÇLARI */
     .date-divider { align-self: center; background: var(--surface2); color: var(--text-dim); font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 12px; margin: 12px 0 6px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     .unread-divider { align-self: center; background: var(--surface2); color: var(--accent); font-size: 0.8rem; font-weight: 700; padding: 6px 16px; border-radius: 16px; margin: 16px 0; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 1px solid rgba(99, 102, 241, 0.3); }
+    
+    /* YENİ: WHATSAPP TARZI YÜZEN AŞAĞI BUTONU (FAB) */
     .scroll-bottom-fab { position: absolute; bottom: 85px; right: 16px; width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; color: var(--text-dim); font-size: 1.2rem; }
     .scroll-bottom-fab.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-bottom-fab .fab-badge { position: absolute; top: -4px; right: -4px; background: #22c55e; color: #fff; font-size: 0.7rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
@@ -97,10 +99,9 @@
     .msg-bubble { max-width: 82%; background: var(--surface2); border-radius: 16px 16px 16px 4px; padding: 8px 12px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: background-color 0.3s; }
     .msg-item.own .msg-bubble { background: var(--accent); color: #fff; border-radius: 16px 16px 4px 16px; }
     
-    /* Etkileşim Menüsü (Yanıtla / Sil / Kimler Gördü) */
-    .msg-action-menu { position: absolute; top: -55px; background: var(--menu-bg); color: var(--menu-text); padding: 6px; border-radius: 16px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 100; animation: popMenu .2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; gap: 2px; min-width: 140px; }
+    .msg-action-menu { position: absolute; top: -55px; background: var(--menu-bg); color: var(--menu-text); padding: 6px; border-radius: 16px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 100; animation: popMenu .2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
     .msg-item:not(.own) .msg-action-menu { left: 0; top: -45px; } 
-    .msg-item.own .msg-action-menu { right: 0; top: -85px; } /* Menü büyüdüğü için biraz daha yukarı */
+    .msg-item.own .msg-action-menu { right: 0; }
     .menu-action { padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .menu-action:active { background: rgba(128,128,128,0.2); }
     .menu-danger { color: #ef4444; }
@@ -170,7 +171,7 @@
     .guide-list li { background: var(--surface2); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
     .guide-list li strong { display: block; color: var(--accent); margin-bottom: 4px; font-size: 0.9rem;}
 
-    /* ===== DİĞER (KİŞİLER VE PANO) ===== */
+    /* ===== DİĞER ===== */
     .user-list-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface2); border-radius: 16px; margin-bottom: 8px; cursor: pointer;}
     .dm-header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .btn-back { background: none; border: none; color: var(--text-dim); font-size: 1rem; display: flex; align-items: center; gap: 4px; cursor: pointer;}
@@ -188,14 +189,6 @@
 <body>
 
 <div id="loading-screen"><div class="spinner"></div></div>
-
-<div class="modal-overlay" id="reads-overlay" onclick="closeReadReceipts()"></div>
-<div class="custom-modal" id="reads-modal">
-  <button class="quote-close" onclick="closeReadReceipts()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
-  <h2 style="color:var(--text); margin-bottom:16px; text-align:center; font-family:var(--font-brand);">Okuyanlar</h2>
-  <div id="reads-list-container" style="max-height:50vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
-    </div>
-</div>
 
 <div class="modal-overlay" id="logout-overlay" onclick="closeLogoutModal()"></div>
 <div class="custom-modal" id="logout-modal">
@@ -243,7 +236,6 @@
     WhatsApp hissiyle donatılmış ilim meclisine hoş geldin!
   </p>
   <ul class="guide-list">
-    <li><strong>👁️ Kimler Gördü?</strong> Kendi gönderdiğin bir mesaja dokunup "Kimler Gördü?" diyerek okuyanları (✓✓) görebilirsin!</li>
     <li><strong>🟢 Çevrimiçi & Yazıyor...</strong> Kişiler listesindeki yeşil nokta anlık aktif olanları gösterir.</li>
     <li><strong>📜 WhatsApp Tarzı Odaklanma</strong> Sohbeti açtığında "Yeni Mesajlar" çizgisinden başlarsın.</li>
     <li><strong>👇 Aşağı Kaydır Butonu</strong> Yukarılarda dolaşırken yeni mesaj gelirse sağ alttaki butondan anında en alta inebilirsin.</li>
@@ -390,7 +382,7 @@
   let activeTab = 'messages', activeDmUser = null, allUsersList = [];
   let unreadMsgs = 0, unreadPosts = 0, unreadDmMap = {};
   
-  // Yüzen Aşağı Kaydır Butonu State'leri
+  // Yeni: Aşağı kaydır butonu state'leri
   let fabUnreadCount = { global: 0, dm: 0 }; 
   let isUserScrollingUp = { global: false, dm: false };
 
@@ -403,6 +395,7 @@
   let typingUsers = { global: new Set(), dm: new Set() }; 
   let typingTimers = { global: null, dm: null };
 
+  // Aylar (Tarih çevirisi için)
   const aylar = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 
   // TEMA
@@ -418,16 +411,6 @@
     document.getElementById('theme-btn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // ===== WHATSAPP OKUNDU (SON GÖRÜLME) BİLDİRİMİ SENKRONU =====
-  let readSyncTimeout = null;
-  function syncReadStatus(chatId) {
-    clearTimeout(readSyncTimeout);
-    readSyncTimeout = setTimeout(async () => {
-      if(!currentNick) return;
-      await db.from('user_chat_reads').upsert({ nick: currentNick, chat_id: chatId, last_read_at: new Date().toISOString() });
-    }, 1000); // Çok fazla istek gitmemesi için 1 saniye bekletilir
-  }
-
   // ===== WHATSAPP SCROLL FONKSİYONU =====
   function scrollToBottom(id, instant = false) { 
     const el = document.getElementById(id); 
@@ -436,26 +419,25 @@
       el.scrollTop = el.scrollHeight;
       if (instant) setTimeout(() => el.style.scrollBehavior = 'smooth', 50);
       
+      // En alta inildiyse FAB'ı sıfırla
       const ctx = id === 'messages-list' ? 'global' : 'dm';
       fabUnreadCount[ctx] = 0;
       updateFabUI(ctx);
-      
-      // En alta inildiyse okunduyu DB'ye yazdır
-      if (ctx === 'global') syncReadStatus('global');
-      if (ctx === 'dm' && activeDmUser) syncReadStatus(`dm_${activeDmUser}`);
     }
   }
 
+  // Scroll Olaylarını Dinle (Yukarı kaydırıldıysa FAB göster)
   function handleScrollEvent(e, context) {
     const el = e.target;
     const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    
     isUserScrollingUp[context] = !isAtBottom;
+    
     if (isAtBottom) {
-      fabUnreadCount[context] = 0; updateFabUI(context);
-      if (context === 'global') syncReadStatus('global');
-      if (context === 'dm' && activeDmUser) syncReadStatus(`dm_${activeDmUser}`);
+      fabUnreadCount[context] = 0;
+      updateFabUI(context);
     } else {
-      updateFabUI(context); 
+      updateFabUI(context); // Sadece butonu gösterir (sayı varsa üzerinde kalır)
     }
   }
   document.getElementById('messages-list').addEventListener('scroll', e => { closeActionMenus(); handleScrollEvent(e, 'global'); });
@@ -464,48 +446,21 @@
   function updateFabUI(context) {
     const fab = document.getElementById(`fab-${context}`);
     const badge = document.getElementById(`fab-badge-${context}`);
+    
     if (isUserScrollingUp[context]) {
       fab.classList.add('show');
-      if (fabUnreadCount[context] > 0) { badge.textContent = fabUnreadCount[context] > 99 ? '99+' : fabUnreadCount[context]; badge.classList.add('show'); } 
-      else { badge.classList.remove('show'); }
-    } else { fab.classList.remove('show'); }
-  }
-
-  // ===== KİMLER GÖRDÜ MODALI =====
-  async function openReadReceipts(msgCreatedAt, listId) {
-    const container = document.getElementById('reads-list-container');
-    container.innerHTML = '<div class="spinner" style="margin: 20px auto;"></div>';
-
-    document.getElementById('reads-overlay').style.display = 'block'; document.getElementById('reads-modal').style.display = 'block';
-    setTimeout(() => { document.getElementById('reads-overlay').classList.add('show'); document.getElementById('reads-modal').classList.add('show'); }, 10);
-
-    let query;
-    if (listId === 'messages-list') {
-      // Genel sohbette benim mesajımdan sonraki okumaları getir
-      query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', 'global').gte('last_read_at', msgCreatedAt).neq('nick', currentNick);
+      if (fabUnreadCount[context] > 0) {
+        badge.textContent = fabUnreadCount[context] > 99 ? '99+' : fabUnreadCount[context];
+        badge.classList.add('show');
+      } else {
+        badge.classList.remove('show');
+      }
     } else {
-      // DM'de (Karşıdaki kişi benim mesajımdan sonra okumuş mu)
-      query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser).gte('last_read_at', msgCreatedAt);
+      fab.classList.remove('show');
     }
-
-    const { data, error } = await query;
-    container.innerHTML = '';
-    
-    if (error) return container.innerHTML = `<div class="empty-state">Hata: ${error.message}</div>`;
-    if (!data || data.length === 0) return container.innerHTML = '<div class="empty-state">Mesajını henüz kimse görmedi.</div>';
-
-    data.forEach(row => {
-      const div = document.createElement('div'); div.className = 'user-list-item';
-      div.innerHTML = `<div class="user-avatar">${row.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1">${escape(row.nick)}</strong><span style="color:#3b82f6; font-size:1.2rem; font-weight:bold;">✓✓</span>`;
-      container.appendChild(div);
-    });
-  }
-  function closeReadReceipts() {
-    document.getElementById('reads-overlay').classList.remove('show'); document.getElementById('reads-modal').classList.remove('show');
-    setTimeout(() => { document.getElementById('reads-overlay').style.display = 'none'; document.getElementById('reads-modal').style.display = 'none'; }, 300);
   }
 
-  // ===== DİĞER MODALLAR =====
+  // ===== MODALLAR =====
   function confirmLogout() { document.getElementById('logout-overlay').style.display = 'block'; document.getElementById('logout-modal').style.display = 'block'; setTimeout(() => { document.getElementById('logout-overlay').classList.add('show'); document.getElementById('logout-modal').classList.add('show'); }, 10); }
   function closeLogoutModal() { document.getElementById('logout-overlay').classList.remove('show'); document.getElementById('logout-modal').classList.remove('show'); setTimeout(() => { document.getElementById('logout-overlay').style.display = 'none'; document.getElementById('logout-modal').style.display = 'none'; }, 300); }
   function executeLogout() { currentNick = null; localStorage.clear(); location.reload(); }
@@ -530,6 +485,10 @@
     setTimeout(() => location.reload(), 1500); 
   }
 
+  function escape(str) { return String(str||'').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function fmtTime(iso) { const d=new Date(iso), h=d.getHours().toString().padStart(2,'0'), m=d.getMinutes().toString().padStart(2,'0'); return `${h}:${m}`; }
+  
+  // WhatsApp Tarzı Tarih Döndürücü
   function getDateString(iso) {
     const d = new Date(iso); const today = new Date();
     const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
@@ -571,7 +530,7 @@
     }, 200);
   }
 
-  // Alt Menü
+  // Alt Menü Tıklama
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => {
     const tab = btn.dataset.tab; closeActionMenus();
     if (activeTab === tab) {
@@ -607,76 +566,105 @@
   }
 
   // ===== WHATSAPP RENDER MOTORU =====
-  let lastRenderedDate = { global: null, dm: null }; 
+  let lastRenderedDate = { global: null, dm: null }; // Tarih ayraçları için takip
 
+  // Toplu Render (Sayfa İlk Açıldığında)
   function renderAllMessages(data, listId, lastReadKey) {
-    const list = document.getElementById(listId); list.innerHTML = '';
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
     const context = listId === 'messages-list' ? 'global' : 'dm';
     lastRenderedDate[context] = null;
     
-    if(!data || data.length === 0) { list.innerHTML = '<div class="empty-state">Sessizlik hakim...</div>'; return; }
+    if(!data || data.length === 0) {
+      list.innerHTML = '<div class="empty-state">Sessizlik hakim...</div>';
+      return;
+    }
 
     const lastRead = localStorage.getItem(lastReadKey);
     let firstUnreadFound = false;
+    let unreadCount = 0;
+
+    // Geçici bir document fragment'te oluştur ki ekrana hızlıca dökülsün
     const fragment = document.createDocumentFragment();
 
     data.forEach(m => {
+      // 1. Tarih Ayracı Kontrolü
       const msgDate = getDateString(m.created_at);
       if (msgDate !== lastRenderedDate[context]) {
-        const dateDiv = document.createElement('div'); dateDiv.className = 'date-divider'; dateDiv.textContent = msgDate;
-        fragment.appendChild(dateDiv); lastRenderedDate[context] = msgDate;
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'date-divider';
+        dateDiv.textContent = msgDate;
+        fragment.appendChild(dateDiv);
+        lastRenderedDate[context] = msgDate;
       }
 
+      // 2. Okunmamış Ayraç Kontrolü (Bizim atmadığımız ve tarihten yeni olan)
       const sender = m.nick || m.sender_nick;
-      if (lastRead && m.created_at > lastRead && sender !== currentNick && !firstUnreadFound) {
-        const uDiv = document.createElement('div'); uDiv.className = 'unread-divider'; uDiv.id = `unread-marker-${context}`; uDiv.innerHTML = `<span>Yeni Mesajlar</span>`;
-        fragment.appendChild(uDiv); firstUnreadFound = true;
+      if (lastRead && m.created_at > lastRead && sender !== currentNick) {
+        unreadCount++;
+        if (!firstUnreadFound) {
+          const uDiv = document.createElement('div');
+          uDiv.className = 'unread-divider';
+          uDiv.id = `unread-marker-${context}`;
+          uDiv.innerHTML = `<span>Yeni Mesajlar</span>`;
+          fragment.appendChild(uDiv);
+          firstUnreadFound = true;
+        }
       }
+
+      // 3. Mesajı Ekle
       fragment.appendChild(createMessageElement(m, listId, true));
     });
 
     list.appendChild(fragment);
 
+    // İlk okumaya (yeni mesaja) pürüzsüz atlama
     if (firstUnreadFound) {
       const marker = document.getElementById(`unread-marker-${context}`);
       if (marker) marker.scrollIntoView({behavior: 'auto', block: 'center'});
     } else {
       scrollToBottom(listId, true);
     }
-    localStorage.setItem(lastReadKey, data[data.length-1].created_at);
     
-    // Açılışta okuduğumuzu belirt
-    syncReadStatus(context === 'global' ? 'global' : `dm_${activeDmUser}`);
+    localStorage.setItem(lastReadKey, data[data.length-1].created_at);
   }
 
+  // Tekil Mesaj Ekleme (Realtime için)
   function appendSingleMessage(m, listId) {
     const list = document.getElementById(listId); if (list.querySelector('.empty-state')) list.innerHTML = '';
     const context = listId === 'messages-list' ? 'global' : 'dm';
-    const sender = m.nick || m.sender_nick; const isOwn = sender === currentNick;
+    const sender = m.nick || m.sender_nick;
+    const isOwn = sender === currentNick;
 
+    // Tarih Ayracı Kontrolü
     const msgDate = getDateString(m.created_at);
     if (msgDate !== lastRenderedDate[context]) {
-      const dateDiv = document.createElement('div'); dateDiv.className = 'date-divider'; dateDiv.textContent = msgDate;
-      list.appendChild(dateDiv); lastRenderedDate[context] = msgDate;
+      const dateDiv = document.createElement('div');
+      dateDiv.className = 'date-divider';
+      dateDiv.textContent = msgDate;
+      list.appendChild(dateDiv);
+      lastRenderedDate[context] = msgDate;
     }
 
-    list.appendChild(createMessageElement(m, listId, false));
+    const msgEl = createMessageElement(m, listId, false);
+    list.appendChild(msgEl);
 
+    // Aşağıdaysak veya kendimiz attıysak KAYDIR
     if (!isUserScrollingUp[context] || isOwn) {
       scrollToBottom(listId);
-      if (listId === 'messages-list' && activeTab === 'messages') {
-        localStorage.setItem('last_read_global', m.created_at); syncReadStatus('global');
-      }
-      if (listId === 'dm-messages-list' && activeTab === 'dm') {
-        localStorage.setItem(`last_read_dm_${activeDmUser}`, m.created_at); syncReadStatus(`dm_${activeDmUser}`);
-      }
+      // Gördüğümüz için tarihi güncelle
+      if (listId === 'messages-list' && activeTab === 'messages') localStorage.setItem('last_read_global', m.created_at);
+      if (listId === 'dm-messages-list' && activeTab === 'dm') localStorage.setItem(`last_read_dm_${activeDmUser}`, m.created_at);
     } else {
+      // Yukarıdaysak FAB'ı güncelle
       if (!isOwn && activeTab === (listId === 'messages-list' ? 'messages' : 'dm')) {
-        fabUnreadCount[context]++; updateFabUI(context);
+        fabUnreadCount[context]++;
+        updateFabUI(context);
       }
     }
   }
 
+  // HTML Elementini Üreten Fabrika
   function createMessageElement(m, listId, isInitialLoad) {
     const sender = m.nick || m.sender_nick, isOwn = sender === currentNick;
     let contentHtml = '', quoteContentPrev = '', isSticker = false, isAudioOrMeme = false;
@@ -691,19 +679,15 @@
 
     const div = document.createElement('div'); 
     div.className = 'msg-item' + (isOwn ? ' own' : '') + (!isInitialLoad ? ' animated' : ''); div.setAttribute('data-id', m.id); 
+    
     div.innerHTML = `<div class="msg-avatar">${sender.substring(0,2).toUpperCase()}</div><div class="msg-bubble ${isSticker ? 'is-sticker' : ''}"><div class="msg-nick">${escape(sender)}</div>${quoteHtml}${contentHtml}<div class="msg-time">${fmtTime(m.created_at)}</div></div>`;
       
     const bubble = div.querySelector('.msg-bubble');
     bubble.addEventListener('click', (e) => {
       e.stopPropagation(); closeActionMenus();
       const menu = document.createElement('div'); menu.className = 'msg-action-menu';
-      
       let menuHtml = `<div class="menu-action" onclick="event.stopPropagation(); setQuote('${escape(sender)}', '${quoteContentPrev}', '${listId==='messages-list'?'global':'dm'}'); closeActionMenus();">↩ Yanıtla</div>`;
-      if (isOwn) {
-        // Kendi mesajımızsa "Kimler Gördü" ve "Sil" eklenir
-        menuHtml += `<div class="menu-action" onclick="event.stopPropagation(); openReadReceipts('${m.created_at}', '${listId}'); closeActionMenus();">👁️ Kimler Gördü?</div>`;
-        menuHtml += `<div class="menu-action menu-danger" onclick="event.stopPropagation(); deleteMessage('${m.id}', '${listId}'); closeActionMenus();">🗑️ Sil</div>`;
-      }
+      if (isOwn) menuHtml += `<div class="menu-action menu-danger" onclick="event.stopPropagation(); deleteMessage('${m.id}', '${listId}'); closeActionMenus();">🗑️ Sil</div>`;
       menu.innerHTML = menuHtml; bubble.appendChild(menu);
     });
 
@@ -767,17 +751,11 @@
   async function loadMediaAssets() {
     const { data: sData } = await db.from('stickers').select('*').order('created_at', {ascending:false});
     const sContainer = document.getElementById('sticker-grid-container'); sContainer.innerHTML='';
-    if(sData && sData.length) sData.forEach(s => { 
-      const btn = document.createElement('button'); btn.className='sticker-item'; btn.innerHTML=`<img src="${s.url}" style="pointer-events:none;"/>`; 
-      btn.addEventListener('click', () => { closeMediaDrawer(); sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); }); sContainer.appendChild(btn); 
-    }); else sContainer.innerHTML='<div class="empty-state" style="grid-column:1/-1">Sticker yok.</div>';
+    if(sData && sData.length) sData.forEach(s => { const btn = document.createElement('button'); btn.className='sticker-item'; btn.innerHTML=`<img src="${s.url}" style="pointer-events:none;"/>`; btn.addEventListener('click', () => { closeMediaDrawer(); sendActualMessage(activeDrawerTarget, `[STICKER]${s.url}`); }); sContainer.appendChild(btn); }); else sContainer.innerHTML='<div class="empty-state" style="grid-column:1/-1">Sticker yok.</div>';
     
     const { data: mData } = await db.from('meme_sounds').select('*').order('created_at', {ascending:false});
     const mContainer = document.getElementById('meme-list-container'); mContainer.innerHTML='';
-    if(mData && mData.length) mData.forEach(m => { 
-      const btn = document.createElement('button'); btn.className='meme-item'; btn.innerHTML=`<div class="meme-item-icon" style="pointer-events:none;">🎵</div><div style="flex:1; pointer-events:none;"><strong>${escape(m.name)}</strong></div>`; 
-      btn.addEventListener('click', () => { closeMediaDrawer(); sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); }); mContainer.appendChild(btn); 
-    }); else mContainer.innerHTML='<div class="empty-state">Ses yok.</div>';
+    if(mData && mData.length) mData.forEach(m => { const btn = document.createElement('button'); btn.className='meme-item'; btn.innerHTML=`<div class="meme-item-icon" style="pointer-events:none;">🎵</div><div style="flex:1; pointer-events:none;"><strong>${escape(m.name)}</strong></div>`; btn.addEventListener('click', () => { closeMediaDrawer(); sendActualMessage(activeDrawerTarget, `[MEMESOUND]${m.url}||${m.name}`); }); mContainer.appendChild(btn); }); else mContainer.innerHTML='<div class="empty-state">Ses yok.</div>';
   }
 
   async function handleMediaUpload(e) {
@@ -792,7 +770,7 @@
     await db.from(table).insert([row]); showToast('Eklendi!'); loadMediaAssets(); e.target.value='';
   }
 
-  // ===== VERİ ÇEKME =====
+  // ===== VERİ ÇEKME & YENİLEME =====
   async function loadMessages() { 
     const {data}=await db.from('messages').select('*').order('created_at',{ascending:false}).limit(100); 
     if(data) { data.reverse(); renderAllMessages(data, 'messages-list', 'last_read_global'); }
@@ -803,36 +781,19 @@
   function renderUserList() {
     const list=document.getElementById('dm-user-list'); list.innerHTML='';
     allUsersList.forEach(u => { 
-      const b = unreadDmMap[u.nick] || 0; 
-      const isOnline = onlineUsers.has(u.nick);
-      
+      const b = unreadDmMap[u.nick] || 0; const isOnline = onlineUsers.has(u.nick);
       const d=document.createElement('div'); d.className='user-list-item'; 
-      d.innerHTML=`
-        <div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div>
-        <strong style="flex:1; display:flex; align-items:center; gap:8px;">
-          ${escape(u.nick)} 
-          ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : '<span class="offline-dot" title="Çevrimdışı"></span>'}
-        </strong>
-        ${b>0?`<span class="badge" style="position:static">${b}</span>`:''}
-      `; 
-      d.onclick=()=>openDm(u.nick); 
-      list.appendChild(d); 
+      d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1; display:flex; align-items:center; gap:8px;">${escape(u.nick)} ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : '<span class="offline-dot" title="Çevrimdışı"></span>'}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; 
+      d.onclick=()=>openDm(u.nick); list.appendChild(d); 
     });
   }
 
   async function openDm(nick) { 
-    activeDmUser=nick; 
-    document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; 
-    document.getElementById('dm-chat-title').textContent=nick; 
-    
-    const dot = document.getElementById('dm-chat-status-dot');
-    dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot';
-    dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
-
+    activeDmUser=nick; document.getElementById('dm-user-list').style.display='none'; document.getElementById('dm-chat-view').style.display='flex'; document.getElementById('dm-chat-title').textContent=nick; 
+    const dot = document.getElementById('dm-chat-status-dot'); dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot'; dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
     if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } 
     
     const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:false}).limit(100); 
-    
     if(data) { data.reverse(); renderAllMessages(data, 'dm-messages-list', `last_read_dm_${nick}`); }
   }
   document.getElementById('dm-back-btn').onclick = () => { activeDmUser=null; document.getElementById('dm-chat-view').style.display='none'; document.getElementById('dm-user-list').style.display='flex'; renderUserList(); };
@@ -843,35 +804,19 @@
   // ===== PRESENCE, BROADCAST VE DB REALTIME KANALI =====
   function subscribeRealtime() {
     if (realtimeChannel) { realtimeChannel.unsubscribe(); }
-
-    realtimeChannel = db.channel('ilim-irfan-room', {
-      config: { presence: { key: currentNick } }
-    });
+    realtimeChannel = db.channel('ilim-irfan-room', { config: { presence: { key: currentNick } } });
 
     realtimeChannel.on('presence', { event: 'sync' }, () => {
-      const state = realtimeChannel.presenceState();
-      onlineUsers.clear();
+      const state = realtimeChannel.presenceState(); onlineUsers.clear();
       for (const id in state) { onlineUsers.add(state[id][0].nick); }
-      
       if(activeTab === 'dm' && activeDmUser === null) renderUserList();
-      if(activeDmUser) {
-        const dot = document.getElementById('dm-chat-status-dot');
-        dot.className = onlineUsers.has(activeDmUser) ? 'online-dot' : 'offline-dot';
-        dot.title = onlineUsers.has(activeDmUser) ? 'Çevrimiçi' : 'Çevrimdışı';
-      }
+      if(activeDmUser) { const dot = document.getElementById('dm-chat-status-dot'); dot.className = onlineUsers.has(activeDmUser) ? 'online-dot' : 'offline-dot'; dot.title = onlineUsers.has(activeDmUser) ? 'Çevrimiçi' : 'Çevrimdışı'; }
     });
 
     realtimeChannel.on('broadcast', { event: 'typing' }, payload => {
-      const { nick, context, isTyping, receiver } = payload.payload;
-      if (nick === currentNick) return; 
-
-      if (context === 'global') {
-        if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick);
-        updateTypingUI('global');
-      } else if (context === 'dm' && receiver === currentNick) {
-        if (isTyping) typingUsers.dm.add(nick); else typingUsers.dm.delete(nick);
-        updateTypingUI('dm');
-      }
+      const { nick, context, isTyping, receiver } = payload.payload; if (nick === currentNick) return; 
+      if (context === 'global') { if (isTyping) typingUsers.global.add(nick); else typingUsers.global.delete(nick); updateTypingUI('global'); } 
+      else if (context === 'dm' && receiver === currentNick) { if (isTyping) typingUsers.dm.add(nick); else typingUsers.dm.delete(nick); updateTypingUI('dm'); }
     });
 
     realtimeChannel
@@ -895,15 +840,12 @@
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'private_messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } });
 
-    realtimeChannel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        await realtimeChannel.track({ nick: currentNick });
-      }
-    });
+    realtimeChannel.subscribe(async (status) => { if (status === 'SUBSCRIBED') { await realtimeChannel.track({ nick: currentNick }); } });
   }
 
   document.getElementById('login-btn').onclick = login;
   document.getElementById('password-input').onkeydown = e => { if(e.key==='Enter') login(); };
+  document.getElementById('logout-btn').onclick = confirmLogout; 
 
   (async function init() { if(currentNick) showApp(); else { document.getElementById('login-screen').style.display='flex'; hideLoading(); } })();
 </script>

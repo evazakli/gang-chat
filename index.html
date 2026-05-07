@@ -508,37 +508,52 @@
 
   // Medya Yükleme (Kullanıcı tarafından)
  async function handleMediaUpload(e) {
-    const file = e.target.files[0]; if(!file) return;
+    const file = e.target.files[0]; 
+    if(!file) return;
+
     const isImage = file.type.startsWith('image/');
     const bucket = isImage ? 'stickers' : 'meme_sounds';
     const table = isImage ? 'stickers' : 'meme_sounds';
     
-    let name = null; 
-    if (!isImage) { 
-      name = prompt("Sesin adı ne olsun?"); 
-      if(!name) return; 
+    let memeName = null;
+    if (!isImage) {
+      memeName = prompt("Bu sesin adı ne olsun?");
+      if (!memeName) return; // İsim girilmezse iptal et
     }
-    
+
     showToast('Yükleniyor...');
-    
-    // 1. Storage'a (Depoya) yükle
-    const {data, error: uploadErr} = await db.storage.from(bucket).upload(`${Date.now()}_${file.name.replace(/\s+/g,'_')}`, file);
-    if(uploadErr) return showToast('Yükleme hatası: ' + uploadErr.message);
-    
-    const url = db.storage.from(bucket).getPublicUrl(data.path).data.publicUrl;
-    
-    // 2. Veritabanına kaydet (Hata buradaydı, artık sticker ise isim göndermiyoruz)
-    const insertData = { url: url, added_by: currentNick };
-    if (!isImage) insertData.name = name; 
-    
-    const { error: dbError } = await db.from(table).insert(insertData);
-    
-    // Eğer veritabanı reddederse artık hatayı ekranda göreceğiz
-    if (dbError) return showToast('Veritabanı hatası: ' + dbError.message);
-    
-    showToast('Başarıyla eklendi!'); 
-    loadMediaAssets(); 
-    e.target.value='';
+
+    try {
+      // 1. Storage'a yükle
+      const fileName = `${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+      const { data: uploadData, error: uploadErr } = await db.storage.from(bucket).upload(fileName, file);
+      
+      if (uploadErr) throw uploadErr;
+
+      // 2. Görsel linkini al
+      const { data: urlData } = db.storage.from(bucket).getPublicUrl(uploadData.path);
+      const publicUrl = urlData.publicUrl;
+
+      // 3. Veritabanı kaydı (Kritik nokta)
+      const row = { url: publicUrl, added_by: currentNick };
+      
+      // Sadece ses dosyası ise "name" sütununu ekle
+      if (!isImage) {
+        row.name = memeName;
+      }
+
+      const { error: dbErr } = await db.from(table).insert([row]);
+      
+      if (dbErr) throw dbErr;
+
+      showToast('Başarıyla eklendi!');
+      loadMediaAssets(); // Listeyi yenile
+    } catch (err) {
+      console.error("Yükleme hatası:", err);
+      showToast("Hata: " + err.message);
+    } finally {
+      e.target.value = ''; // Seçimi temizle
+    }
   }
 
   // ===== TEMEL SOHBET / PANO GETİRME =====

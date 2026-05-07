@@ -73,11 +73,9 @@
     @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
     .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 6px; position: relative; scroll-behavior: smooth;}
 
-    /* YENİ: WHATSAPP TARZI TARİH VE OKUNMAMIŞ AYRAÇLARI */
+    /* ===== AYRAÇLAR & FAB BUTONU ===== */
     .date-divider { align-self: center; background: var(--surface2); color: var(--text-dim); font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 12px; margin: 12px 0 6px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     .unread-divider { align-self: center; background: var(--surface2); color: var(--accent); font-size: 0.8rem; font-weight: 700; padding: 6px 16px; border-radius: 16px; margin: 16px 0; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 1px solid rgba(99, 102, 241, 0.3); }
-    
-    /* YENİ: WHATSAPP TARZI YÜZEN AŞAĞI BUTONU (FAB) */
     .scroll-bottom-fab { position: absolute; bottom: 85px; right: 16px; width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; color: var(--text-dim); font-size: 1.2rem; }
     .scroll-bottom-fab.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-bottom-fab .fab-badge { position: absolute; top: -4px; right: -4px; background: #22c55e; color: #fff; font-size: 0.7rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
@@ -99,9 +97,30 @@
     .msg-bubble { max-width: 82%; background: var(--surface2); border-radius: 16px 16px 16px 4px; padding: 8px 12px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: background-color 0.3s; }
     .msg-item.own .msg-bubble { background: var(--accent); color: #fff; border-radius: 16px 16px 4px 16px; }
     
-    .msg-action-menu { position: absolute; top: -55px; background: var(--menu-bg); color: var(--menu-text); padding: 6px; border-radius: 16px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 100; animation: popMenu .2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
-    .msg-item:not(.own) .msg-action-menu { left: 0; top: -45px; } 
-    .msg-item.own .msg-action-menu { right: 0; }
+    /* Görüldü Mavi Tikler */
+    .msg-ticks { margin-left: 6px; font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: -2px; display: inline-block; transition: color 0.3s; }
+    .msg-ticks.read { color: #38bdf8; text-shadow: 0 0 2px rgba(56, 189, 248, 0.4); }
+
+    /* GÜVENLİ ETKİLEŞİM MENÜSÜ */
+    .msg-action-menu { 
+      position: absolute; 
+      bottom: calc(100% + 5px); /* Menü daima yukarı büyür, üstü kesmez */
+      background: var(--menu-bg); 
+      color: var(--menu-text); 
+      padding: 6px; 
+      border-radius: 16px; 
+      font-weight: 600; 
+      font-size: 0.9rem; 
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2); 
+      z-index: 100; 
+      animation: popMenu .2s cubic-bezier(0.2, 0.8, 0.2, 1); 
+      display: flex; 
+      flex-direction: column; 
+      gap: 2px; 
+      min-width: 150px; 
+    }
+    .msg-item:not(.own) .msg-action-menu { left: 0; } 
+    .msg-item.own .msg-action-menu { right: 0; } 
     .menu-action { padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .menu-action:active { background: rgba(128,128,128,0.2); }
     .menu-danger { color: #ef4444; }
@@ -118,7 +137,7 @@
     .msg-nick { font-size: .75rem; font-weight: 600; color: var(--accent2); margin-bottom: 2px; }
     .msg-item.own .msg-nick { display: none; }
     .msg-text { font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
-    .msg-time { font-size: .65rem; opacity: 0.7; margin-top: 4px; text-align: right; }
+    .msg-time { font-size: .65rem; opacity: 0.7; margin-top: 4px; text-align: right; display: flex; justify-content: flex-end; align-items: center;}
     .btn-meme-play { background: rgba(128,128,128,0.15); border: none; color: inherit; padding: 10px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.95rem; font-family: var(--font-main); }
     .msg-item.own .btn-meme-play { background: rgba(255,255,255,0.2); color: #fff; }
 
@@ -190,6 +209,13 @@
 
 <div id="loading-screen"><div class="spinner"></div></div>
 
+<div class="modal-overlay" id="reads-overlay" onclick="closeReadReceipts()"></div>
+<div class="custom-modal" id="reads-modal">
+  <button class="quote-close" onclick="closeReadReceipts()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
+  <h2 style="color:var(--text); margin-bottom:16px; text-align:center; font-family:var(--font-brand);">Okuyanlar</h2>
+  <div id="reads-list-container" style="max-height:50vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+</div>
+
 <div class="modal-overlay" id="logout-overlay" onclick="closeLogoutModal()"></div>
 <div class="custom-modal" id="logout-modal">
   <button class="quote-close" onclick="closeLogoutModal()" style="position:absolute; top:16px; right:16px; font-size:1.8rem;">×</button>
@@ -236,12 +262,12 @@
     WhatsApp hissiyle donatılmış ilim meclisine hoş geldin!
   </p>
   <ul class="guide-list">
-    <li><strong>🟢 Çevrimiçi & Yazıyor...</strong> Kişiler listesindeki yeşil nokta anlık aktif olanları gösterir.</li>
-    <li><strong>📜 WhatsApp Tarzı Odaklanma</strong> Sohbeti açtığında "Yeni Mesajlar" çizgisinden başlarsın.</li>
+    <li><strong>✓✓ Mavi Tikler:</strong> Gönderdiğin mesajın altındaki tikler, birileri okuduğunda anında maviye döner! Kendi mesajına dokunup <b>"Kimler Gördü"</b> dersen okuyan listesini görebilirsin.</li>
+    <li><strong>⚡ Şimşek Hızı:</strong> Mesajların artık 0 gecikmeyle anında ekrana düşer!</li>
+    <li><strong>🟢 Çevrimiçi & Yazıyor...</strong> Yeşil nokta anlık aktif olanları gösterir.</li>
+    <li><strong>📜 Odaklanma:</strong> Sohbeti açtığında "Yeni Mesajlar" çizgisinden başlarsın.</li>
     <li><strong>👇 Aşağı Kaydır Butonu</strong> Yukarılarda dolaşırken yeni mesaj gelirse sağ alttaki butondan anında en alta inebilirsin.</li>
     <li><strong>↩️ Kaydırarak Yanıtla</strong> Bir mesaja hızlıca yanıt vermek için mesajı sağa doğru <b>kaydır (swipe)</b>.</li>
-    <li><strong>🗑️ Mesaj Silme</strong> Kendi mesajına dokunup <b>Sil</b> diyerek kelamını gruptan silebilirsin.</li>
-    <li><strong>😜 Sticker & Meme</strong> Sol alttaki emoji butonundan komik sesler ve stickerlar yollayabilirsin.</li>
   </ul>
   <div style="margin-top:20px; text-align:center;">
     <button class="btn-primary" onclick="closeGuide()">Anladım, Başlayalım!</button>
@@ -382,10 +408,8 @@
   let activeTab = 'messages', activeDmUser = null, allUsersList = [];
   let unreadMsgs = 0, unreadPosts = 0, unreadDmMap = {};
   
-  // Yeni: Aşağı kaydır butonu state'leri
   let fabUnreadCount = { global: 0, dm: 0 }; 
   let isUserScrollingUp = { global: false, dm: false };
-
   let quoteState = { global: null, dm: null }; 
   let activeDrawerTarget = 'global'; 
   let isRecording = false, mediaRecorder = null, audioChunks = [];
@@ -394,80 +418,101 @@
   let onlineUsers = new Set(); 
   let typingUsers = { global: new Set(), dm: new Set() }; 
   let typingTimers = { global: null, dm: null };
-
-  // Aylar (Tarih çevirisi için)
   const aylar = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 
-  // TEMA
+  let globalReadWatermark = null;
+  let dmReadWatermark = null;
+
+  function generateUUID() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+  }
+
   const savedTheme = localStorage.getItem('ilimirfan_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
   document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
   document.getElementById('theme-btn').addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('ilimirfan_theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme); localStorage.setItem('ilimirfan_theme', newTheme);
     document.getElementById('theme-btn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
   });
 
-  // ===== WHATSAPP SCROLL FONKSİYONU =====
+  let readSyncTimeout = null;
+  function syncReadStatus(chatId) {
+    clearTimeout(readSyncTimeout);
+    readSyncTimeout = setTimeout(async () => {
+      if(!currentNick) return;
+      await db.from('user_chat_reads').upsert({ nick: currentNick, chat_id: chatId, last_read_at: new Date().toISOString() });
+    }, 1000); 
+  }
+
+  async function fetchWatermarks() {
+    const { data: gData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', 'global').neq('nick', currentNick).order('last_read_at', {ascending: false}).limit(1);
+    if (gData && gData.length) globalReadWatermark = gData[0].last_read_at;
+
+    if (activeDmUser) {
+      const { data: dData } = await db.from('user_chat_reads').select('last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser);
+      if (dData && dData.length) dmReadWatermark = dData[0].last_read_at;
+    }
+  }
+
+  function updateTicksUI(listId, watermark) {
+    document.querySelectorAll(`#${listId} .msg-item.own`).forEach(el => {
+      const time = el.getAttribute('data-time');
+      const tick = document.getElementById(`tick-${el.getAttribute('data-id')}`);
+      if (tick && time && time <= watermark) tick.classList.add('read');
+    });
+  }
+
   function scrollToBottom(id, instant = false) { 
     const el = document.getElementById(id); 
     if(el) {
       if (instant) el.style.scrollBehavior = 'auto';
       el.scrollTop = el.scrollHeight;
       if (instant) setTimeout(() => el.style.scrollBehavior = 'smooth', 50);
-      
-      // En alta inildiyse FAB'ı sıfırla
       const ctx = id === 'messages-list' ? 'global' : 'dm';
-      fabUnreadCount[ctx] = 0;
-      updateFabUI(ctx);
+      fabUnreadCount[ctx] = 0; updateFabUI(ctx);
+      if (ctx === 'global') syncReadStatus('global');
+      if (ctx === 'dm' && activeDmUser) syncReadStatus(`dm_${activeDmUser}`);
     }
   }
 
-  // Scroll Olaylarını Dinle (Yukarı kaydırıldıysa FAB göster)
   function handleScrollEvent(e, context) {
-    const el = e.target;
-    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
-    
+    const el = e.target; const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
     isUserScrollingUp[context] = !isAtBottom;
-    
-    if (isAtBottom) {
-      fabUnreadCount[context] = 0;
-      updateFabUI(context);
-    } else {
-      updateFabUI(context); // Sadece butonu gösterir (sayı varsa üzerinde kalır)
-    }
+    if (isAtBottom) { fabUnreadCount[context] = 0; updateFabUI(context); if (context === 'global') syncReadStatus('global'); if (context === 'dm' && activeDmUser) syncReadStatus(`dm_${activeDmUser}`); } 
+    else updateFabUI(context); 
   }
   document.getElementById('messages-list').addEventListener('scroll', e => { closeActionMenus(); handleScrollEvent(e, 'global'); });
   document.getElementById('dm-messages-list').addEventListener('scroll', e => { closeActionMenus(); handleScrollEvent(e, 'dm'); });
 
   function updateFabUI(context) {
-    const fab = document.getElementById(`fab-${context}`);
-    const badge = document.getElementById(`fab-badge-${context}`);
-    
-    if (isUserScrollingUp[context]) {
-      fab.classList.add('show');
-      if (fabUnreadCount[context] > 0) {
-        badge.textContent = fabUnreadCount[context] > 99 ? '99+' : fabUnreadCount[context];
-        badge.classList.add('show');
-      } else {
-        badge.classList.remove('show');
-      }
-    } else {
-      fab.classList.remove('show');
-    }
+    const fab = document.getElementById(`fab-${context}`), badge = document.getElementById(`fab-badge-${context}`);
+    if (isUserScrollingUp[context]) { fab.classList.add('show'); if (fabUnreadCount[context] > 0) { badge.textContent = fabUnreadCount[context] > 99 ? '99+' : fabUnreadCount[context]; badge.classList.add('show'); } else badge.classList.remove('show'); } 
+    else fab.classList.remove('show');
   }
 
-  // ===== MODALLAR =====
+  async function openReadReceipts(msgCreatedAt, listId) {
+    const container = document.getElementById('reads-list-container'); container.innerHTML = '<div class="spinner" style="margin: 20px auto;"></div>';
+    document.getElementById('reads-overlay').style.display = 'block'; document.getElementById('reads-modal').style.display = 'block';
+    setTimeout(() => { document.getElementById('reads-overlay').classList.add('show'); document.getElementById('reads-modal').classList.add('show'); }, 10);
+    let query;
+    if (listId === 'messages-list') query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', 'global').gte('last_read_at', msgCreatedAt).neq('nick', currentNick);
+    else query = db.from('user_chat_reads').select('nick, last_read_at').eq('chat_id', `dm_${currentNick}`).eq('nick', activeDmUser).gte('last_read_at', msgCreatedAt);
+    const { data, error } = await query;
+    container.innerHTML = '';
+    if (error) return container.innerHTML = `<div class="empty-state">Hata: ${error.message}</div>`;
+    if (!data || data.length === 0) return container.innerHTML = '<div class="empty-state">Mesajını henüz kimse görmedi.</div>';
+    data.forEach(row => { const div = document.createElement('div'); div.className = 'user-list-item'; div.innerHTML = `<div class="user-avatar">${row.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1">${escape(row.nick)}</strong><span style="color:#3b82f6; font-size:1.2rem; font-weight:bold;">✓✓</span>`; container.appendChild(div); });
+  }
+  function closeReadReceipts() { document.getElementById('reads-overlay').classList.remove('show'); document.getElementById('reads-modal').classList.remove('show'); setTimeout(() => { document.getElementById('reads-overlay').style.display = 'none'; document.getElementById('reads-modal').style.display = 'none'; }, 300); }
+
   function confirmLogout() { document.getElementById('logout-overlay').style.display = 'block'; document.getElementById('logout-modal').style.display = 'block'; setTimeout(() => { document.getElementById('logout-overlay').classList.add('show'); document.getElementById('logout-modal').classList.add('show'); }, 10); }
   function closeLogoutModal() { document.getElementById('logout-overlay').classList.remove('show'); document.getElementById('logout-modal').classList.remove('show'); setTimeout(() => { document.getElementById('logout-overlay').style.display = 'none'; document.getElementById('logout-modal').style.display = 'none'; }, 300); }
   function executeLogout() { currentNick = null; localStorage.clear(); location.reload(); }
-  
   function openGuide() { document.getElementById('guide-overlay').style.display = 'block'; document.getElementById('guide-modal').style.display = 'block'; setTimeout(() => { document.getElementById('guide-overlay').classList.add('show'); document.getElementById('guide-modal').classList.add('show'); }, 10); }
   function closeGuide() { document.getElementById('guide-overlay').classList.remove('show'); document.getElementById('guide-modal').classList.remove('show'); setTimeout(() => { document.getElementById('guide-overlay').style.display = 'none'; document.getElementById('guide-modal').style.display = 'none'; }, 300); }
-
   function openSettings() { document.getElementById('settings-nick').value = currentNick; document.getElementById('settings-current-pass').value = ''; document.getElementById('settings-new-pass').value = ''; document.getElementById('settings-overlay').style.display = 'block'; document.getElementById('settings-modal').style.display = 'block'; setTimeout(() => { document.getElementById('settings-overlay').classList.add('show'); document.getElementById('settings-modal').classList.add('show'); }, 10); }
   function closeSettings() { document.getElementById('settings-overlay').classList.remove('show'); document.getElementById('settings-modal').classList.remove('show'); setTimeout(() => { document.getElementById('settings-overlay').style.display = 'none'; document.getElementById('settings-modal').style.display = 'none'; }, 300); }
 
@@ -481,22 +526,10 @@
     const finalPass = newPass ? await hashPass(newPass) : hashedCurrent;
     const { error } = await db.rpc('change_profile', { old_nick: currentNick, new_nick: newNick, new_password: finalPass });
     if (error) return showToast('Güncelleme başarısız: ' + error.message);
-    showToast('Profil güncellendi!'); currentNick = newNick; localStorage.setItem('ilimirfan_nick', newNick); closeSettings();
-    setTimeout(() => location.reload(), 1500); 
+    showToast('Profil güncellendi!'); currentNick = newNick; localStorage.setItem('ilimirfan_nick', newNick); closeSettings(); setTimeout(() => location.reload(), 1500); 
   }
 
-  function escape(str) { return String(str||'').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-  function fmtTime(iso) { const d=new Date(iso), h=d.getHours().toString().padStart(2,'0'), m=d.getMinutes().toString().padStart(2,'0'); return `${h}:${m}`; }
-  
-  // WhatsApp Tarzı Tarih Döndürücü
-  function getDateString(iso) {
-    const d = new Date(iso); const today = new Date();
-    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-    if (d.toDateString() === today.toDateString()) return "Bugün";
-    if (d.toDateString() === yesterday.toDateString()) return "Dün";
-    return `${d.getDate()} ${aylar[d.getMonth()]} ${d.getFullYear()}`;
-  }
-
+  function getDateString(iso) { const d = new Date(iso); const today = new Date(); const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1); if (d.toDateString() === today.toDateString()) return "Bugün"; if (d.toDateString() === yesterday.toDateString()) return "Dün"; return `${d.getDate()} ${aylar[d.getMonth()]} ${d.getFullYear()}`; }
   function showToast(msg) { const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
   function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
   document.addEventListener('click', closeActionMenus);
@@ -506,13 +539,10 @@
   
   async function login() {
     const nick=document.getElementById('nick-input').value.trim(), pass=document.getElementById('password-input').value.trim(), err=document.getElementById('login-error');
-    if(!nick || !pass) return err.textContent='Eksik bilgi girdin.';
-    const btn=document.getElementById('login-btn'); btn.textContent='Bekle...'; btn.disabled=true;
+    if(!nick || !pass) return err.textContent='Eksik bilgi girdin.'; const btn=document.getElementById('login-btn'); btn.textContent='Bekle...'; btn.disabled=true;
     try {
-      const hPass=await hashPass(pass);
-      const { data } = await db.from('users').select('password').eq('nick',nick);
-      if(data && data.length) { if(data[0].password!==hPass) throw new Error('Hatalı parola!'); }
-      else { await db.from('users').insert([{nick,password:hPass}]); }
+      const hPass=await hashPass(pass); const { data } = await db.from('users').select('password').eq('nick',nick);
+      if(data && data.length) { if(data[0].password!==hPass) throw new Error('Hatalı parola!'); } else { await db.from('users').insert([{nick,password:hPass}]); }
       currentNick=nick; localStorage.setItem('ilimirfan_nick',nick); showApp(true);
     } catch(e) { err.textContent=e.message; btn.textContent='Giriş Yap'; btn.disabled=false; }
   }
@@ -521,217 +551,158 @@
     document.getElementById('login-screen').style.display='none'; document.getElementById('app').style.display='flex';
     document.getElementById('header-nick').textContent=currentNick; document.getElementById('header-avatar').textContent=currentNick.substring(0,2).toUpperCase();
     loadMessages(); loadPosts(); fetchAllUsers(); loadMediaAssets(); subscribeRealtime();
-    setTimeout(() => { 
-      document.getElementById('loading-screen').style.opacity='0'; 
-      setTimeout(()=> {
-        document.getElementById('loading-screen').style.display='none';
-        if (isNewLogin && !localStorage.getItem('ilimirfan_guide_seen')) { openGuide(); localStorage.setItem('ilimirfan_guide_seen', 'true'); }
-      }, 400); 
-    }, 200);
+    setTimeout(() => { document.getElementById('loading-screen').style.opacity='0'; setTimeout(()=> { document.getElementById('loading-screen').style.display='none'; if (isNewLogin && !localStorage.getItem('ilimirfan_guide_seen')) { openGuide(); localStorage.setItem('ilimirfan_guide_seen', 'true'); } }, 400); }, 200);
   }
 
-  // Alt Menü Tıklama
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab; closeActionMenus();
-    if (activeTab === tab) {
-      if (tab === 'messages') scrollToBottom('messages-list', true);
-      if (tab === 'dm' && activeDmUser) scrollToBottom('dm-messages-list', true);
-      if (tab === 'posts') document.getElementById('posts-list').scrollTop = 0;
-      return;
-    }
-    activeTab = tab; 
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active');
-    if(tab==='messages') { unreadMsgs=0; updateBadges(); }
-    if(tab==='dm') { if(!activeDmUser) fetchAllUsers(); }
-    if(tab==='posts') { unreadPosts=0; updateBadges(); }
-  }));
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab; closeActionMenus();
+      if (activeTab === tab) { if (tab === 'messages') scrollToBottom('messages-list', true); if (tab === 'dm' && activeDmUser) scrollToBottom('dm-messages-list', true); if (tab === 'posts') document.getElementById('posts-list').scrollTop = 0; return; }
+      activeTab = tab; document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active');
+      if(tab==='messages') { unreadMsgs=0; updateBadges(); } if(tab==='dm') { if(!activeDmUser) fetchAllUsers(); } if(tab==='posts') { unreadPosts=0; updateBadges(); }
+    });
+  });
 
-  function updateBadges() {
-    document.getElementById('msg-badge').style.display=unreadMsgs>0?'block':'none'; document.getElementById('msg-badge').textContent=unreadMsgs;
-    document.getElementById('post-badge').style.display=unreadPosts>0?'block':'none'; document.getElementById('post-badge').textContent=unreadPosts;
-    const dmTot=Object.values(unreadDmMap).reduce((a,b)=>a+b,0); document.getElementById('dm-badge').style.display=dmTot>0?'block':'none'; document.getElementById('dm-badge').textContent=dmTot;
-  }
+  function updateBadges() { document.getElementById('msg-badge').style.display=unreadMsgs>0?'block':'none'; document.getElementById('msg-badge').textContent=unreadMsgs; document.getElementById('post-badge').style.display=unreadPosts>0?'block':'none'; document.getElementById('post-badge').textContent=unreadPosts; const dmTot=Object.values(unreadDmMap).reduce((a,b)=>a+b,0); document.getElementById('dm-badge').style.display=dmTot>0?'block':'none'; document.getElementById('dm-badge').textContent=dmTot; }
 
-  function sendTypingStatus(context, isTyping) {
-    if (!realtimeChannel) return;
-    const receiver = context === 'dm' ? activeDmUser : null;
-    realtimeChannel.send({ type: 'broadcast', event: 'typing', payload: { nick: currentNick, context, isTyping, receiver } });
-  }
+  function sendTypingStatus(context, isTyping) { if (!realtimeChannel) return; const receiver = context === 'dm' ? activeDmUser : null; realtimeChannel.send({ type: 'broadcast', event: 'typing', payload: { nick: currentNick, context, isTyping, receiver } }); }
   function handleTypingInput(context) { sendTypingStatus(context, true); clearTimeout(typingTimers[context]); typingTimers[context] = setTimeout(() => { sendTypingStatus(context, false); }, 2000); }
-  function updateTypingUI(context) {
-    const el = document.getElementById(`${context}-typing`); const users = Array.from(typingUsers[context]);
-    if (users.length === 0) { el.classList.remove('show'); setTimeout(() => { if(Array.from(typingUsers[context]).length === 0) el.textContent = ''; }, 300); } 
-    else { el.textContent = users.length === 1 ? `${users[0]} yazıyor...` : `${users.join(', ')} yazıyor...`; el.classList.add('show'); }
-  }
+  function updateTypingUI(context) { const el = document.getElementById(`${context}-typing`); const users = Array.from(typingUsers[context]); if (users.length === 0) { el.classList.remove('show'); setTimeout(() => { if(Array.from(typingUsers[context]).length === 0) el.textContent = ''; }, 300); } else { el.textContent = users.length === 1 ? `${users[0]} yazıyor...` : `${users.join(', ')} yazıyor...`; el.classList.add('show'); } }
 
-  // ===== WHATSAPP RENDER MOTORU =====
-  let lastRenderedDate = { global: null, dm: null }; // Tarih ayraçları için takip
+  let lastRenderedDate = { global: null, dm: null }; 
 
-  // Toplu Render (Sayfa İlk Açıldığında)
   function renderAllMessages(data, listId, lastReadKey) {
-    const list = document.getElementById(listId);
-    list.innerHTML = '';
-    const context = listId === 'messages-list' ? 'global' : 'dm';
-    lastRenderedDate[context] = null;
-    
-    if(!data || data.length === 0) {
-      list.innerHTML = '<div class="empty-state">Sessizlik hakim...</div>';
-      return;
-    }
-
-    const lastRead = localStorage.getItem(lastReadKey);
-    let firstUnreadFound = false;
-    let unreadCount = 0;
-
-    // Geçici bir document fragment'te oluştur ki ekrana hızlıca dökülsün
-    const fragment = document.createDocumentFragment();
+    const list = document.getElementById(listId); list.innerHTML = '';
+    const context = listId === 'messages-list' ? 'global' : 'dm'; lastRenderedDate[context] = null;
+    if(!data || data.length === 0) { list.innerHTML = '<div class="empty-state">Sessizlik hakim...</div>'; return; }
+    const lastRead = localStorage.getItem(lastReadKey); let firstUnreadFound = false; const fragment = document.createDocumentFragment();
 
     data.forEach(m => {
-      // 1. Tarih Ayracı Kontrolü
       const msgDate = getDateString(m.created_at);
-      if (msgDate !== lastRenderedDate[context]) {
-        const dateDiv = document.createElement('div');
-        dateDiv.className = 'date-divider';
-        dateDiv.textContent = msgDate;
-        fragment.appendChild(dateDiv);
-        lastRenderedDate[context] = msgDate;
-      }
-
-      // 2. Okunmamış Ayraç Kontrolü (Bizim atmadığımız ve tarihten yeni olan)
+      if (msgDate !== lastRenderedDate[context]) { const dateDiv = document.createElement('div'); dateDiv.className = 'date-divider'; dateDiv.textContent = msgDate; fragment.appendChild(dateDiv); lastRenderedDate[context] = msgDate; }
       const sender = m.nick || m.sender_nick;
-      if (lastRead && m.created_at > lastRead && sender !== currentNick) {
-        unreadCount++;
-        if (!firstUnreadFound) {
-          const uDiv = document.createElement('div');
-          uDiv.className = 'unread-divider';
-          uDiv.id = `unread-marker-${context}`;
-          uDiv.innerHTML = `<span>Yeni Mesajlar</span>`;
-          fragment.appendChild(uDiv);
-          firstUnreadFound = true;
-        }
-      }
-
-      // 3. Mesajı Ekle
+      if (lastRead && m.created_at > lastRead && sender !== currentNick && !firstUnreadFound) { const uDiv = document.createElement('div'); uDiv.className = 'unread-divider'; uDiv.id = `unread-marker-${context}`; uDiv.innerHTML = `<span>Yeni Mesajlar</span>`; fragment.appendChild(uDiv); firstUnreadFound = true; }
       fragment.appendChild(createMessageElement(m, listId, true));
     });
-
     list.appendChild(fragment);
-
-    // İlk okumaya (yeni mesaja) pürüzsüz atlama
-    if (firstUnreadFound) {
-      const marker = document.getElementById(`unread-marker-${context}`);
-      if (marker) marker.scrollIntoView({behavior: 'auto', block: 'center'});
-    } else {
-      scrollToBottom(listId, true);
-    }
-    
-    localStorage.setItem(lastReadKey, data[data.length-1].created_at);
+    if (firstUnreadFound) { const marker = document.getElementById(`unread-marker-${context}`); if (marker) marker.scrollIntoView({behavior: 'auto', block: 'center'}); } else { scrollToBottom(listId, true); }
+    localStorage.setItem(lastReadKey, data[data.length-1].created_at); syncReadStatus(context === 'global' ? 'global' : `dm_${activeDmUser}`);
   }
 
-  // Tekil Mesaj Ekleme (Realtime için)
   function appendSingleMessage(m, listId) {
     const list = document.getElementById(listId); if (list.querySelector('.empty-state')) list.innerHTML = '';
     const context = listId === 'messages-list' ? 'global' : 'dm';
-    const sender = m.nick || m.sender_nick;
-    const isOwn = sender === currentNick;
+    const sender = m.nick || m.sender_nick; const isOwn = sender === currentNick;
 
-    // Tarih Ayracı Kontrolü
     const msgDate = getDateString(m.created_at);
-    if (msgDate !== lastRenderedDate[context]) {
-      const dateDiv = document.createElement('div');
-      dateDiv.className = 'date-divider';
-      dateDiv.textContent = msgDate;
-      list.appendChild(dateDiv);
-      lastRenderedDate[context] = msgDate;
-    }
+    if (msgDate !== lastRenderedDate[context]) { const dateDiv = document.createElement('div'); dateDiv.className = 'date-divider'; dateDiv.textContent = msgDate; list.appendChild(dateDiv); lastRenderedDate[context] = msgDate; }
+    list.appendChild(createMessageElement(m, listId, false));
 
-    const msgEl = createMessageElement(m, listId, false);
-    list.appendChild(msgEl);
-
-    // Aşağıdaysak veya kendimiz attıysak KAYDIR
     if (!isUserScrollingUp[context] || isOwn) {
       scrollToBottom(listId);
-      // Gördüğümüz için tarihi güncelle
-      if (listId === 'messages-list' && activeTab === 'messages') localStorage.setItem('last_read_global', m.created_at);
-      if (listId === 'dm-messages-list' && activeTab === 'dm') localStorage.setItem(`last_read_dm_${activeDmUser}`, m.created_at);
+      if (listId === 'messages-list' && activeTab === 'messages') { localStorage.setItem('last_read_global', m.created_at); syncReadStatus('global'); }
+      if (listId === 'dm-messages-list' && activeTab === 'dm') { localStorage.setItem(`last_read_dm_${activeDmUser}`, m.created_at); syncReadStatus(`dm_${activeDmUser}`); }
     } else {
-      // Yukarıdaysak FAB'ı güncelle
-      if (!isOwn && activeTab === (listId === 'messages-list' ? 'messages' : 'dm')) {
-        fabUnreadCount[context]++;
-        updateFabUI(context);
-      }
+      if (!isOwn && activeTab === (listId === 'messages-list' ? 'messages' : 'dm')) { fabUnreadCount[context]++; updateFabUI(context); }
     }
   }
 
-  // HTML Elementini Üreten Fabrika
+  // DÜZELTİLDİ: Menü OLuşturma Artık Kırılmaz (DOM objesiyle)
   function createMessageElement(m, listId, isInitialLoad) {
     const sender = m.nick || m.sender_nick, isOwn = sender === currentNick;
-    let contentHtml = '', quoteContentPrev = '', isSticker = false, isAudioOrMeme = false;
+    let contentHtml = '', quoteContentPrev = '';
 
-    if (m.content.startsWith('[STICKER]')) { isSticker = true; quoteContentPrev = '🖼️ Sticker'; contentHtml = `<img src="${escape(m.content.replace('[STICKER]', ''))}" class="msg-sticker-img" />`; } 
-    else if (m.content.startsWith('[MEMESOUND]')) { isAudioOrMeme = true; const parts = m.content.replace('[MEMESOUND]', '').split('||'); quoteContentPrev = '🎵 ' + (parts[1]||'Ses'); contentHtml = `<button class="btn-meme-play" onclick="new Audio('${escape(parts[0])}').play()">▶️ ${escape(parts[1]||'Ses')}</button>`; } 
-    else if (m.content.startsWith('[AUDIO]')) { isAudioOrMeme = true; quoteContentPrev = '🎙️ Sesli Mesaj'; contentHtml = `<audio controls src="${escape(m.content.replace('[AUDIO]', ''))}"></audio>`; } 
-    else { contentHtml = `<div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div>`; quoteContentPrev = escape(m.content); }
+    if (m.content.startsWith('[STICKER]')) { quoteContentPrev = '🖼️ Sticker'; contentHtml = `<img src="${escape(m.content.replace('[STICKER]', ''))}" class="msg-sticker-img" />`; } 
+    else if (m.content.startsWith('[MEMESOUND]')) { const parts = m.content.replace('[MEMESOUND]', '').split('||'); quoteContentPrev = '🎵 ' + (parts[1]||'Ses'); contentHtml = `<button class="btn-meme-play" onclick="new Audio('${escape(parts[0])}').play()">▶️ ${escape(parts[1]||'Ses')}</button>`; } 
+    else if (m.content.startsWith('[AUDIO]')) { quoteContentPrev = '🎙️ Sesli Mesaj'; contentHtml = `<audio controls src="${escape(m.content.replace('[AUDIO]', ''))}"></audio>`; } 
+    else { contentHtml = `<div class="msg-text">${escape(m.content).replace(/\n/g, '<br>')}</div>`; quoteContentPrev = m.content; }
 
-    let quoteHtml = '';
-    if (m.quoted_nick && m.quoted_content) quoteHtml = `<div class="msg-quote"><strong>${escape(m.quoted_nick)}</strong> ${escape(m.quoted_content)}</div>`;
+    let quoteHtml = ''; if (m.quoted_nick && m.quoted_content) quoteHtml = `<div class="msg-quote"><strong>${escape(m.quoted_nick)}</strong> ${escape(m.quoted_content)}</div>`;
+
+    let ticksHtml = '';
+    if (isOwn) {
+       let isRead = false;
+       if (listId === 'messages-list' && globalReadWatermark && m.created_at <= globalReadWatermark) isRead = true;
+       if (listId === 'dm-messages-list' && dmReadWatermark && m.created_at <= dmReadWatermark) isRead = true;
+       ticksHtml = `<span class="msg-ticks ${isRead ? 'read' : ''}" id="tick-${m.id}">✓✓</span>`;
+    }
 
     const div = document.createElement('div'); 
-    div.className = 'msg-item' + (isOwn ? ' own' : '') + (!isInitialLoad ? ' animated' : ''); div.setAttribute('data-id', m.id); 
-    
-    div.innerHTML = `<div class="msg-avatar">${sender.substring(0,2).toUpperCase()}</div><div class="msg-bubble ${isSticker ? 'is-sticker' : ''}"><div class="msg-nick">${escape(sender)}</div>${quoteHtml}${contentHtml}<div class="msg-time">${fmtTime(m.created_at)}</div></div>`;
+    div.className = 'msg-item' + (isOwn ? ' own' : '') + (!isInitialLoad ? ' animated' : ''); 
+    div.setAttribute('data-id', m.id); div.setAttribute('data-time', m.created_at); 
+    div.innerHTML = `<div class="msg-avatar">${sender.substring(0,2).toUpperCase()}</div><div class="msg-bubble ${m.content.startsWith('[STICKER]') ? 'is-sticker' : ''}"><div class="msg-nick">${escape(sender)}</div>${quoteHtml}${contentHtml}<div class="msg-time">${fmtTime(m.created_at)}${ticksHtml}</div></div>`;
       
     const bubble = div.querySelector('.msg-bubble');
     bubble.addEventListener('click', (e) => {
       e.stopPropagation(); closeActionMenus();
-      const menu = document.createElement('div'); menu.className = 'msg-action-menu';
-      let menuHtml = `<div class="menu-action" onclick="event.stopPropagation(); setQuote('${escape(sender)}', '${quoteContentPrev}', '${listId==='messages-list'?'global':'dm'}'); closeActionMenus();">↩ Yanıtla</div>`;
-      if (isOwn) menuHtml += `<div class="menu-action menu-danger" onclick="event.stopPropagation(); deleteMessage('${m.id}', '${listId}'); closeActionMenus();">🗑️ Sil</div>`;
-      menu.innerHTML = menuHtml; bubble.appendChild(menu);
+      
+      const menu = document.createElement('div'); 
+      menu.className = 'msg-action-menu';
+      
+      const btnReply = document.createElement('div'); btnReply.className = 'menu-action'; btnReply.innerHTML = '↩ Yanıtla';
+      btnReply.onclick = (ev) => { ev.stopPropagation(); setQuote(sender, quoteContentPrev, listId === 'messages-list' ? 'global' : 'dm'); closeActionMenus(); };
+      menu.appendChild(btnReply);
+
+      if (isOwn) {
+        const btnViews = document.createElement('div'); btnViews.className = 'menu-action'; btnViews.innerHTML = '👁️ Kimler Gördü?';
+        btnViews.onclick = (ev) => { ev.stopPropagation(); openReadReceipts(m.created_at, listId); closeActionMenus(); };
+        menu.appendChild(btnViews);
+
+        const btnDel = document.createElement('div'); btnDel.className = 'menu-action menu-danger'; btnDel.innerHTML = '🗑️ Sil';
+        btnDel.onclick = (ev) => { ev.stopPropagation(); deleteMessage(m.id, listId); closeActionMenus(); };
+        menu.appendChild(btnDel);
+      }
+      
+      bubble.appendChild(menu);
     });
 
     let touchStartX = 0;
     bubble.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
     bubble.addEventListener('touchmove', e => { let diff = e.changedTouches[0].screenX - touchStartX; if (diff > 10 && diff < 80) bubble.style.transform = `translateX(${diff}px)`; }, {passive:true});
     bubble.addEventListener('touchend', e => { bubble.style.transform = `translateX(0)`; if (e.changedTouches[0].screenX - touchStartX > 50) setQuote(sender, quoteContentPrev, listId==='messages-list'?'global':'dm'); });
-
     return div;
   }
 
   function closeActionMenus() { document.querySelectorAll('.msg-action-menu').forEach(m => m.remove()); }
-  function setQuote(nick, content, context) { quoteState[context] = { nick, content }; document.getElementById(`${context}-quote-preview`).style.display = 'flex'; document.getElementById(`${context}-quote-nick`).textContent = nick; document.getElementById(`${context}-quote-text`).textContent = content; document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus(); }
+  
+  function setQuote(nick, content, context) { 
+    quoteState[context] = { nick, content }; 
+    document.getElementById(`${context}-quote-preview`).style.display = 'flex'; 
+    document.getElementById(`${context}-quote-nick`).textContent = nick; 
+    document.getElementById(`${context}-quote-text`).textContent = content; 
+    document.getElementById(`${context==='global'?'msg':'dm'}-input`).focus(); 
+  }
+  
   function cancelQuote(context) { quoteState[context]=null; document.getElementById(`${context}-quote-preview`).style.display='none'; }
 
   async function toggleRecording(context) {
     const btn = document.getElementById(`${context}-mic-btn`);
     if(isRecording) { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); showToast('Gönderiliyor...'); return; }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
-      mediaRecorder = new MediaRecorder(stream); audioChunks=[];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:true }); mediaRecorder = new MediaRecorder(stream); audioChunks=[];
       mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(t=>t.stop());
-        const {data, error} = await db.storage.from('audio').upload(`${currentNick}_${Date.now()}.webm`, new Blob(audioChunks,{type:'audio/webm'}));
-        if(!error) sendActualMessage(context, `[AUDIO]${db.storage.from('audio').getPublicUrl(data.path).data.publicUrl}`);
-      };
+      mediaRecorder.onstop = async () => { stream.getTracks().forEach(t=>t.stop()); const {data, error} = await db.storage.from('audio').upload(`${currentNick}_${Date.now()}.webm`, new Blob(audioChunks,{type:'audio/webm'})); if(!error) sendActualMessage(context, `[AUDIO]${db.storage.from('audio').getPublicUrl(data.path).data.publicUrl}`); };
       mediaRecorder.start(); isRecording=true; btn.classList.add('recording');
     } catch(e) { showToast('Mikrofon izni gerekli!'); }
   }
 
   async function sendActualMessage(context, textContent) {
-    const q = quoteState[context];
-    if(context==='global') await db.from('messages').insert({ nick: currentNick, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
-    else await db.from('private_messages').insert({ sender_nick: currentNick, receiver_nick: activeDmUser, content: textContent, quoted_nick: q?.nick, quoted_content: q?.content });
+    const q = quoteState[context]; const table = context === 'global' ? 'messages' : 'private_messages'; const listId = context === 'global' ? 'messages-list' : 'dm-messages-list';
+    const msgId = generateUUID(); const now = new Date().toISOString();
+    const newMsg = { id: msgId, content: textContent, created_at: now, quoted_nick: q?.nick, quoted_content: q?.content };
+    if (context === 'global') newMsg.nick = currentNick; else { newMsg.sender_nick = currentNick; newMsg.receiver_nick = activeDmUser; }
+    appendSingleMessage(newMsg, listId); 
     cancelQuote(context); sendTypingStatus(context, false);
+    const { error } = await db.from(table).insert([newMsg]);
+    if (error) { showToast('⚠️ Gönderilemedi!'); const el = document.querySelector(`.msg-item[data-id="${msgId}"]`); if(el) el.remove(); }
   }
 
   async function deleteMessage(messageId, listId) {
     const el = document.querySelector(`.msg-item[data-id="${messageId}"]`); if (el) el.style.display = 'none';
     const table = listId === 'messages-list' ? 'messages' : 'private_messages';
     const { data, error } = await db.from(table).delete().eq('id', messageId).select();
-    if (error || !data || data.length === 0) { if (el) el.style.display = 'flex'; showToast('⚠️ Silinemedi. Sayfayı yenileyin.'); } 
-    else { if (el) el.remove(); }
+    if (error || !data || data.length === 0) { if (el) el.style.display = 'flex'; showToast('⚠️ Silinemedi.'); } else { if (el) el.remove(); }
   }
 
   document.getElementById('msg-send-btn').addEventListener('click', () => { const i=document.getElementById('msg-input'); if(i.value.trim()){ sendActualMessage('global', i.value.trim()); i.value=''; i.style.height='auto'; }});
@@ -770,8 +741,9 @@
     await db.from(table).insert([row]); showToast('Eklendi!'); loadMediaAssets(); e.target.value='';
   }
 
-  // ===== VERİ ÇEKME & YENİLEME =====
+  // ===== VERİ ÇEKME =====
   async function loadMessages() { 
+    await fetchWatermarks(); 
     const {data}=await db.from('messages').select('*').order('created_at',{ascending:false}).limit(100); 
     if(data) { data.reverse(); renderAllMessages(data, 'messages-list', 'last_read_global'); }
   }
@@ -782,9 +754,7 @@
     const list=document.getElementById('dm-user-list'); list.innerHTML='';
     allUsersList.forEach(u => { 
       const b = unreadDmMap[u.nick] || 0; const isOnline = onlineUsers.has(u.nick);
-      const d=document.createElement('div'); d.className='user-list-item'; 
-      d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1; display:flex; align-items:center; gap:8px;">${escape(u.nick)} ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : '<span class="offline-dot" title="Çevrimdışı"></span>'}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; 
-      d.onclick=()=>openDm(u.nick); list.appendChild(d); 
+      const d=document.createElement('div'); d.className='user-list-item'; d.innerHTML=`<div class="user-avatar">${u.nick.substring(0,2).toUpperCase()}</div><strong style="flex:1; display:flex; align-items:center; gap:8px;">${escape(u.nick)} ${isOnline ? '<span class="online-dot" title="Çevrimiçi"></span>' : '<span class="offline-dot" title="Çevrimdışı"></span>'}</strong>${b>0?`<span class="badge" style="position:static">${b}</span>`:''}`; d.onclick=()=>openDm(u.nick); list.appendChild(d); 
     });
   }
 
@@ -793,6 +763,7 @@
     const dot = document.getElementById('dm-chat-status-dot'); dot.className = onlineUsers.has(nick) ? 'online-dot' : 'offline-dot'; dot.title = onlineUsers.has(nick) ? 'Çevrimiçi' : 'Çevrimdışı';
     if(unreadDmMap[nick]) { delete unreadDmMap[nick]; updateBadges(); } 
     
+    await fetchWatermarks(); 
     const {data}=await db.from('private_messages').select('*').or(`and(sender_nick.eq.${currentNick},receiver_nick.eq.${nick}),and(sender_nick.eq.${nick},receiver_nick.eq.${currentNick})`).order('created_at',{ascending:false}).limit(100); 
     if(data) { data.reverse(); renderAllMessages(data, 'dm-messages-list', `last_read_dm_${nick}`); }
   }
@@ -803,12 +774,12 @@
 
   // ===== PRESENCE, BROADCAST VE DB REALTIME KANALI =====
   function subscribeRealtime() {
-    if (realtimeChannel) { realtimeChannel.unsubscribe(); }
+    if (realtimeChannel) realtimeChannel.unsubscribe();
     realtimeChannel = db.channel('ilim-irfan-room', { config: { presence: { key: currentNick } } });
 
     realtimeChannel.on('presence', { event: 'sync' }, () => {
       const state = realtimeChannel.presenceState(); onlineUsers.clear();
-      for (const id in state) { onlineUsers.add(state[id][0].nick); }
+      for (const id in state) onlineUsers.add(state[id][0].nick);
       if(activeTab === 'dm' && activeDmUser === null) renderUserList();
       if(activeDmUser) { const dot = document.getElementById('dm-chat-status-dot'); dot.className = onlineUsers.has(activeDmUser) ? 'online-dot' : 'offline-dot'; dot.title = onlineUsers.has(activeDmUser) ? 'Çevrimiçi' : 'Çevrimdışı'; }
     });
@@ -820,32 +791,35 @@
     });
 
     realtimeChannel
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_chat_reads' }, p => {
+        const row = p.new; if (!row || row.nick === currentNick) return; 
+        if (row.chat_id === 'global') { if (!globalReadWatermark || row.last_read_at > globalReadWatermark) globalReadWatermark = row.last_read_at; updateTicksUI('messages-list', globalReadWatermark); } 
+        else if (activeDmUser && row.chat_id === `dm_${currentNick}` && row.nick === activeDmUser) { dmReadWatermark = row.last_read_at; updateTicksUI('dm-messages-list', dmReadWatermark); }
+      })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, p=>{ 
+        if (document.querySelector(`.msg-item[data-id="${p.new.id}"]`)) return; 
         appendSingleMessage(p.new, 'messages-list'); 
-        if(activeTab!=='messages' && p.new.nick!==currentNick){ unreadMsgs++; updateBadges(); } 
+        if(activeTab!=='messages'){ unreadMsgs++; updateBadges(); } 
       })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'private_messages'}, p=>{ 
+        if (document.querySelector(`.msg-item[data-id="${p.new.id}"]`)) return; 
         const pm=p.new; 
         if(pm.sender_nick===currentNick || pm.receiver_nick===currentNick) { 
           if(activeDmUser===(pm.sender_nick===currentNick?pm.receiver_nick:pm.sender_nick)) { 
             appendSingleMessage(pm, 'dm-messages-list'); 
             if(pm.receiver_nick===currentNick && activeTab!=='dm') { unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); }
-          } else if(pm.receiver_nick===currentNick) { 
-            unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); 
-            if(activeTab==='dm') renderUserList(); 
-          } 
+          } else if(pm.receiver_nick===currentNick) { unreadDmMap[pm.sender_nick]=(unreadDmMap[pm.sender_nick]||0)+1; updateBadges(); if(activeTab==='dm') renderUserList(); } 
         } 
       })
       .on('postgres_changes',{event:'DELETE',schema:'public',table:'private_messages'}, p=>{ const el = document.querySelector(`.msg-item[data-id="${p.old.id}"]`); if(el) el.remove(); })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'}, ()=>{ loadPosts(); if(activeTab!=='posts'){ unreadPosts++; updateBadges(); } });
 
-    realtimeChannel.subscribe(async (status) => { if (status === 'SUBSCRIBED') { await realtimeChannel.track({ nick: currentNick }); } });
+    realtimeChannel.subscribe(async (status) => { if (status === 'SUBSCRIBED') await realtimeChannel.track({ nick: currentNick }); });
   }
 
   document.getElementById('login-btn').onclick = login;
   document.getElementById('password-input').onkeydown = e => { if(e.key==='Enter') login(); };
-  document.getElementById('logout-btn').onclick = confirmLogout; 
 
   (async function init() { if(currentNick) showApp(); else { document.getElementById('login-screen').style.display='flex'; hideLoading(); } })();
 </script>

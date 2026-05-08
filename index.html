@@ -391,7 +391,7 @@
 
   let quoteState = { global: null, dm: null }; 
   let activeDrawerTarget = 'global'; 
-  let isRecording = false, mediaRecorder = null, audioChunks = [];
+  let isRecording = false, isMicLoading = false, mediaRecorder = null, audioChunks = [];
 
   let realtimeChannel = null; 
   let onlineUsers = new Set(); 
@@ -704,18 +704,24 @@
 
   async function toggleRecording(context) {
     const btn = document.getElementById(`${context}-mic-btn`);
+    if(isMicLoading) return;
     if(isRecording) { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); showToast('Gönderiliyor...'); return; }
     try {
+      isMicLoading = true;
       const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
       mediaRecorder = new MediaRecorder(stream); audioChunks=[];
       mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
       mediaRecorder.onstop = async () => {
         stream.getTracks().forEach(t=>t.stop());
-        const {data, error} = await db.storage.from('audio').upload(`${currentNick}_${Date.now()}.webm`, new Blob(audioChunks,{type:'audio/webm'}));
-        if(!error) sendActualMessage(context, `[AUDIO]${db.storage.from('audio').getPublicUrl(data.path).data.publicUrl}`);
+        if (audioChunks.length === 0) { showToast('Ses çok kısa!'); return; }
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'mp4' : (mimeType.includes('ogg') ? 'ogg' : 'webm');
+        const {data, error} = await db.storage.from('audio').upload(`${currentNick}_${Date.now()}.${ext}`, new Blob(audioChunks,{type: mimeType}));
+        if(error) { showToast('Ses yüklenemedi!'); return; }
+        sendActualMessage(context, `[AUDIO]${db.storage.from('audio').getPublicUrl(data.path).data.publicUrl}`);
       };
       mediaRecorder.start(); isRecording=true; btn.classList.add('recording');
-    } catch(e) { showToast('Mikrofon izni gerekli!'); }
+    } catch(e) { showToast('Mikrofon izni gerekli veya desteklenmiyor!'); console.error(e); } finally { isMicLoading = false; }
   }
 
   async function sendActualMessage(context, textContent) {

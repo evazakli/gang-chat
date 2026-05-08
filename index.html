@@ -705,7 +705,7 @@
   async function toggleRecording(context) {
     const btn = document.getElementById(`${context}-mic-btn`);
     if(isMicLoading) return;
-    if(isRecording) { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); showToast('Gönderiliyor...'); return; }
+    if(isRecording) { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); btn.innerHTML = '🎙️'; showToast('Gönderiliyor...'); return; }
     try {
       isMicLoading = true;
       const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
@@ -720,7 +720,7 @@
         if(error) { showToast('Ses yüklenemedi!'); return; }
         sendActualMessage(context, `[AUDIO]${db.storage.from('audio').getPublicUrl(data.path).data.publicUrl}`);
       };
-      mediaRecorder.start(); isRecording=true; btn.classList.add('recording');
+      mediaRecorder.start(); isRecording=true; btn.classList.add('recording'); btn.innerHTML = '⏹️';
     } catch(e) { showToast('Mikrofon izni gerekli veya desteklenmiyor!'); console.error(e); } finally { isMicLoading = false; }
   }
 
